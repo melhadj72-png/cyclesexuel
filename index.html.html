@@ -1,0 +1,1937 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>الفيلم الوثائقي العلمي 2D الكامل — الدورة الجنسية (10:13)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      background-color: #0b1120;
+      color: #f8fafc;
+    }
+    .stage-16-9 {
+      aspect-ratio: 16 / 9;
+      background-color: #F8F9FA;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.75);
+    }
+    .subtitle-box {
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(6px);
+      text-shadow: 0 2px 4px rgba(0,0,0,0.65);
+    }
+    input[type=range] {
+      direction: ltr;
+    }
+    /* Barre de défilement discrète pour les chapitres */
+    .chapters-scroll::-webkit-scrollbar {
+      height: 6px;
+    }
+    .chapters-scroll::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 999px;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-between p-2 sm:p-4 select-none">
+
+  <!-- En-tête : Import Audio Original & Export Vidéo 1080p -->
+  <header class="w-full max-w-7xl flex flex-wrap items-center justify-between gap-3 bg-slate-900/95 border border-slate-800 px-4 py-2.5 rounded-2xl">
+    <div class="flex items-center gap-3">
+      <span id="statusDot" class="inline-block w-3 h-3 rounded-full bg-cyan-400"></span>
+      <div>
+        <h1 class="text-sm sm:text-base md:text-lg font-extrabold text-white">المونتاج الكامل للوثائقي العلمي 2D — الدورة الجنسية (10:13)</h1>
+        <p class="text-xs text-slate-400">10 مشاهد متكاملة • مصطلحات ثنائية اللغة (عربي / فرنسي) واضحة • متزامن مع الصوت الأصلي</p>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2">
+      <!-- Chargement audio original -->
+      <label class="cursor-pointer bg-cyan-600 hover:bg-cyan-500 text-white text-xs sm:text-sm font-bold px-3.5 py-2 rounded-xl transition flex items-center gap-2 shadow">
+        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z"/>
+        </svg>
+        <span id="audioFileLabel">1. اختر ملفك الصوتي الأصلي</span>
+        <input type="file" id="audioInput" accept="audio/*" class="hidden" />
+      </label>
+
+      <!-- Exportation directe en fichier vidéo WebM 1080p -->
+      <button id="exportBtn" class="bg-rose-600 hover:bg-rose-500 text-white text-xs sm:text-sm font-bold px-3.5 py-2 rounded-xl transition flex items-center gap-2 shadow">
+        <span id="exportIcon">⏺ تصدير الفيديو (1080p)</span>
+      </button>
+
+      <button id="fullscreenBtn" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-bold px-3 py-2 rounded-xl transition border border-slate-700">
+        ملء الشاشة
+      </button>
+    </div>
+  </header>
+
+  <!-- Scène Principale 16:9 (1920x1080) -->
+  <main id="stageContainer" class="w-full max-w-7xl my-2 relative rounded-2xl overflow-hidden stage-16-9 border-2 border-slate-800">
+    <canvas id="sceneCanvas" class="w-full h-full block"></canvas>
+
+    <!-- Indicateur de scène -->
+    <div id="sceneBadge" class="absolute top-3 right-3 sm:top-4 sm:right-4 bg-slate-900/85 text-white text-xs sm:text-sm font-bold px-3.5 py-1.5 rounded-full border border-slate-600/50 backdrop-blur-sm">
+      المشهد 1 : مقدمة — الدورة الجنسية
+    </div>
+
+    <!-- Chronomètre -->
+    <div dir="ltr" id="timecodeBadge" class="absolute top-3 left-3 sm:top-4 sm:left-4 bg-slate-900/85 text-cyan-300 font-mono text-xs sm:text-sm font-bold px-3.5 py-1.5 rounded-full border border-slate-600/50">
+      00:00.00 / 10:13.38
+    </div>
+  </main>
+
+  <!-- Barre de contrôle et navigation par chapitres -->
+  <footer class="w-full max-w-7xl bg-slate-900/95 border border-slate-800 px-4 py-2.5 rounded-2xl flex flex-col gap-2">
+    <div class="flex items-center gap-3">
+      <button id="playPauseBtn" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2 rounded-xl transition flex items-center gap-2 shadow shrink-0 text-xs sm:text-sm">
+        <span id="playIcon">▶ تشغيل الفيلم الكامل</span>
+      </button>
+
+      <button id="restartBtn" class="bg-slate-800 hover:bg-slate-700 text-white font-bold px-3 py-2 rounded-xl transition text-xs sm:text-sm border border-slate-700 shrink-0">
+        ↺ البداية
+      </button>
+
+      <div class="flex-1 flex items-center gap-2">
+        <input id="timelineSlider" type="range" min="0" max="613.38" step="0.05" value="0" class="w-full accent-cyan-400 cursor-pointer h-2 bg-slate-800 rounded-lg" />
+      </div>
+    </div>
+
+    <!-- Navigation rapide des 10 scènes du cours -->
+    <div class="flex items-center gap-1.5 overflow-x-auto chapters-scroll pb-1 pt-1 border-t border-slate-800 text-xs">
+      <span class="text-slate-400 shrink-0 ml-1">المشاهد :</span>
+      <button data-seek="0.5" class="seek-btn shrink-0 bg-slate-800 hover:bg-cyan-700 px-2.5 py-1 rounded-lg transition">1. المقدمة (00:00)</button>
+      <button data-seek="40.6" class="seek-btn shrink-0 bg-slate-800 hover:bg-cyan-700 px-2.5 py-1 rounded-lg transition">2. دورة المبيض والإباضة (00:40)</button>
+      <button data-seek="125.2" class="seek-btn shrink-0 bg-slate-800 hover:bg-cyan-700 px-2.5 py-1 rounded-lg transition">2هـ. المرحلة الأصفرية (02:05)</button>
+      <button data-seek="169.3" class="seek-btn shrink-0 bg-slate-800 hover:bg-cyan-700 px-2.5 py-1 rounded-lg transition">3. هرمونات المبيض (02:49)</button>
+      <button data-seek="191.9" class="seek-btn shrink-0 bg-slate-800 hover:bg-cyan-700 px-2.5 py-1 rounded-lg transition">4. دورة الرحم (03:11)</button>
+      <button data-seek="332.7" class="seek-btn shrink-0 bg-slate-800 hover:bg-cyan-700 px-2.5 py-1 rounded-lg transition">5. المخاط العنقي (05:32)</button>
+      <button data-seek="401.8" class="seek-btn shrink-0 bg-slate-800 hover:bg-cyan-700 px-2.5 py-1 rounded-lg transition">6. العضلة الرحمية (06:41)</button>
+      <button data-seek="413.9" class="seek-btn shrink-0 bg-slate-800 hover:bg-cyan-700 px-2.5 py-1 rounded-lg transition">7. حرارة الجسم (06:53)</button>
+      <button data-seek="437.9" class="seek-btn shrink-0 bg-slate-800 hover:bg-cyan-700 px-2.5 py-1 rounded-lg transition">8. آثار الهرمونات والشبق (07:17)</button>
+      <button data-seek="508.7" class="seek-btn shrink-0 bg-slate-800 hover:bg-cyan-700 px-2.5 py-1 rounded-lg transition">9. FSH و LH (08:28)</button>
+      <button data-seek="583.6" class="seek-btn shrink-0 bg-slate-800 hover:bg-cyan-700 px-2.5 py-1 rounded-lg transition">10. الملخص العام (09:43)</button>
+    </div>
+  </footer>
+
+  <!-- Modale personnalisée (remplace alert()) -->
+  <div id="infoModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 text-center shadow-2xl">
+      <h3 id="modalTitle" class="text-lg font-extrabold text-white mb-2">تصدير الفيديو 1080p</h3>
+      <p id="modalBody" class="text-sm text-slate-300 leading-relaxed mb-5"></p>
+      <button id="closeModalBtn" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold px-6 py-2 rounded-xl transition">حسناً</button>
+    </div>
+  </div>
+
+  <audio id="narrationAudio" preload="auto" crossorigin="anonymous"></audio>
+
+  <script>
+    /**
+     * MOTEUR COMPLET DU DOCUMENTAIRE SCIENTIFIQUE 2D (00:00.00 -> 10:13.38)
+     * 100% vectoriel 2D, résolution 1920x1080, zéro 3D, zéro image fixe statique.
+     */
+    const canvas = document.getElementById('sceneCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = 1920;
+    canvas.height = 1080;
+
+    const TOTAL_DURATION = 613.38;
+    const audio = document.getElementById('narrationAudio');
+    const audioInput = document.getElementById('audioInput');
+    const audioFileLabel = document.getElementById('audioFileLabel');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const playIcon = document.getElementById('playIcon');
+    const restartBtn = document.getElementById('restartBtn');
+    const timelineSlider = document.getElementById('timelineSlider');
+    const sceneBadge = document.getElementById('sceneBadge');
+    const timecodeBadge = document.getElementById('timecodeBadge');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    const stageContainer = document.getElementById('stageContainer');
+    const exportBtn = document.getElementById('exportBtn');
+    const exportIcon = document.getElementById('exportIcon');
+    const statusDot = document.getElementById('statusDot');
+    const infoModal = document.getElementById('infoModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+
+    function showModal(title, body) {
+      modalTitle.textContent = title;
+      modalBody.textContent = body;
+      infoModal.classList.remove('hidden');
+      infoModal.classList.add('flex');
+    }
+    closeModalBtn.addEventListener('click', () => {
+      infoModal.classList.add('hidden');
+      infoModal.classList.remove('flex');
+    });
+
+    // Charte graphique uniforme sur les 10 minutes
+    const C = {
+      bg: '#F8F9FA',
+      ink: '#1E293B',
+      muted: '#64748B',
+      cyan: '#00A8E8',      // Œstrogènes / Féminin
+      orange: '#FF7B00',    // Progestérone
+      fsh: '#8338EC',       // FSH
+      lh: '#FF006E',        // LH
+      male: '#3B82F6',      // Masculin
+      ovary: '#FFCAD4',     // Ovaire
+      ovaryLine: '#E07A9A',
+      corpusLuteum: '#FFD166',
+      corpusAlbicans: '#E2E8F0',
+      myometrium: '#9E2A2B',
+      endometrium: '#F28482',
+      blood: '#E63946',
+      glycogen: '#F59E0B',
+      mucus: '#38BDF8',
+      green: '#10B981'
+    };
+
+    // État global
+    let hasAudio = false;
+    let isPlaying = false;
+    let simTime = 0;
+    let lastFrameTimestamp = null;
+    let mediaRecorder = null;
+    let recordedChunks = [];
+    let isRecording = false;
+
+    // Utilitaires mathématiques
+    const clamp = (v, min = 0, max = 1) => Math.max(min, Math.min(max, v));
+    const lerp = (a, b, t) => a + (b - a) * clamp(t);
+    const easeOut = t => 1 - Math.pow(1 - clamp(t), 3);
+    const easeInOut = t => {
+      t = clamp(t);
+      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    };
+    const prog = (t, s, e) => clamp((t - s) / Math.max(0.001, e - s));
+
+    // Contrôles Audio & Lecture
+    audioInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      audio.src = URL.createObjectURL(file);
+      hasAudio = true;
+      audioFileLabel.textContent = `✓ ${file.name}`;
+      simTime = 0;
+      audio.currentTime = 0;
+      pausePlayback();
+    });
+
+    function startPlayback() {
+      isPlaying = true;
+      lastFrameTimestamp = performance.now();
+      playIcon.textContent = "⏸ إيقاف مؤقت";
+      statusDot.classList.add('animate-ping');
+      if (hasAudio) {
+        audio.currentTime = simTime;
+        audio.play().catch(() => {});
+      }
+    }
+
+    function pausePlayback() {
+      isPlaying = false;
+      playIcon.textContent = "▶ تشغيل الفيلم الكامل";
+      statusDot.classList.remove('animate-ping');
+      if (hasAudio) audio.pause();
+    }
+
+    playPauseBtn.addEventListener('click', () => {
+      if (simTime >= TOTAL_DURATION) {
+        simTime = 0;
+        if (hasAudio) audio.currentTime = 0;
+      }
+      isPlaying ? pausePlayback() : startPlayback();
+    });
+
+    restartBtn.addEventListener('click', () => {
+      simTime = 0;
+      if (hasAudio) audio.currentTime = 0;
+      startPlayback();
+    });
+
+    timelineSlider.addEventListener('input', (e) => {
+      simTime = parseFloat(e.target.value);
+      if (hasAudio) audio.currentTime = simTime;
+    });
+
+    document.querySelectorAll('.seek-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        simTime = parseFloat(btn.dataset.seek);
+        if (hasAudio) audio.currentTime = simTime;
+        startPlayback();
+      });
+    });
+
+    fullscreenBtn.addEventListener('click', () => {
+      if (!document.fullscreenElement) stageContainer.requestFullscreen().catch(() => {});
+      else document.exitFullscreen();
+    });
+
+    // Exportateur Vidéo WebM 1080p natif
+    exportBtn.addEventListener('click', async () => {
+      if (isRecording) {
+        mediaRecorder.stop();
+        return;
+      }
+      if (!hasAudio) {
+        showModal("تنبيه قبل التصدير", "يرجى أولاً اختيار ملفك الصوتي الأصلي عبر الزر الأزرق (1. اختر ملفك الصوتي الأصلي) حتى يتم دمج الصوت مع الصورة في ملف الفيديو النهائي.");
+        return;
+      }
+      try {
+        const canvasStream = canvas.captureStream(60);
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const source = audioCtx.createMediaElementSource(audio);
+        const dest = audioCtx.createMediaStreamDestination();
+        source.connect(dest);
+        source.connect(audioCtx.destination);
+
+        const combined = new MediaStream([
+          ...canvasStream.getVideoTracks(),
+          ...dest.stream.getAudioTracks()
+        ]);
+
+        recordedChunks = [];
+        mediaRecorder = new MediaRecorder(combined, {
+          mimeType: MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus') ? 'video/webm;codecs=vp9,opus' : 'video/webm',
+          videoBitsPerSecond: 8000000
+        });
+
+        mediaRecorder.ondataavailable = e => { if (e.data.size > 0) recordedChunks.push(e.data); };
+        mediaRecorder.onstop = () => {
+          isRecording = false;
+          exportIcon.textContent = "⏺ تصدير الفيديو (1080p)";
+          exportBtn.classList.remove('animate-pulse');
+          const blob = new Blob(recordedChunks, { type: 'video/webm' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'documentaire_cycle_sexuel_2D_1080p.webm';
+          a.click();
+          showModal("اكتمل التصدير بنجاح", "تم تنزيل ملف الفيديو عالي الجودة (1080p) متضمناً الرسوم المتحركة 2D والصوت الأصلي والترجمة العربية.");
+        };
+
+        simTime = 0;
+        audio.currentTime = 0;
+        isRecording = true;
+        exportIcon.textContent = "⏹ إيقاف وحفظ الفيديو";
+        exportBtn.classList.add('animate-pulse');
+        mediaRecorder.start(250);
+        startPlayback();
+      } catch (err) {
+        showModal("معلومة التصدير", "للتصدير المباشر، يمكنك أيضاً تشغيل الفيلم بوضع ملء الشاشة واستخدام مسجل الشاشة المدمج في نظامك (OBS أو QuickTime أو شريط ألعاب Windows) للحصول على ملف MP4 مباشر.");
+      }
+    });
+
+    // =========================================================================
+    // OUTILS DE DESSIN VECTORIEL 2D PARTAGÉS
+    // =========================================================================
+
+    function clearStage(titleAr, titleFr = '') {
+      ctx.fillStyle = C.bg;
+      ctx.fillRect(0, 0, 1920, 1080);
+
+      // Grille scientifique discrète
+      ctx.strokeStyle = '#E2E8F0';
+      ctx.lineWidth = 1.5;
+      for (let x = 0; x < 1920; x += 80) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 1080); ctx.stroke();
+      }
+      for (let y = 0; y < 1080; y += 80) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(1920, y); ctx.stroke();
+      }
+
+      if (titleAr) {
+        box(480, 26, 960, 78, 36, '#FFFFFF', '#CBD5E1', 3);
+        ctx.fillStyle = C.ink;
+        ctx.font = '800 30px Cairo';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(titleAr, 960, titleFr ? 50 : 65);
+        if (titleFr) {
+          ctx.fillStyle = C.cyan;
+          ctx.font = '700 20px Cairo';
+          ctx.fillText(titleFr, 960, 82);
+        }
+      }
+    }
+
+    function box(x, y, w, h, r, fill, stroke = null, lw = 4) {
+      ctx.beginPath();
+      ctx.roundRect(x, y, w, h, r);
+      if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+      if (stroke) { ctx.lineWidth = lw; ctx.strokeStyle = stroke; ctx.stroke(); }
+    }
+
+    // Dessin d'une flèche vectorielle 2D avec pointe triangulaire
+    function arrow(x1, y1, x2, y2, color, width = 6, headSize = 18) {
+      const angle = Math.atan2(y2 - y1, x2 - x1);
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = width;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2 - headSize * 0.6 * Math.cos(angle), y2 - headSize * 0.6 * Math.sin(angle));
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(x2, y2);
+      ctx.lineTo(x2 - headSize * Math.cos(angle - Math.PI / 6), y2 - headSize * Math.sin(angle - Math.PI / 6));
+      ctx.lineTo(x2 - headSize * Math.cos(angle + Math.PI / 6), y2 - headSize * Math.sin(angle + Math.PI / 6));
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // Étiquette bilingue (Arabe + Français) avec flèche optionnelle pointant vers l'élément sujet
+    function callout(bx, by, bw, bh, ar, fr, color, targetX = null, targetY = null, bg = '#FFFFFF') {
+      if (targetX !== null && targetY !== null) {
+        const cx = bx + bw / 2;
+        const cy = by + bh / 2;
+        const ang = Math.atan2(targetY - cy, targetX - cx);
+        const sx = cx + Math.cos(ang) * (bw * 0.45);
+        const sy = cy + Math.sin(ang) * (bh * 0.45);
+        arrow(sx, sy, targetX, targetY, color, 5, 16);
+        // Cercle pulsant sur l'élément désigné
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(targetX, targetY, 12 + Math.sin(simTime * 8) * 4, 0, Math.PI * 2);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 4;
+        ctx.stroke();
+        ctx.restore();
+      }
+      box(bx, by, bw, bh, 20, bg, color, 4);
+      text(ar, bx + bw / 2, by + bh * 0.32, 23, C.ink, '800');
+      text(fr, bx + bw / 2, by + bh * 0.72, 21, color, '800');
+    }
+
+    // Dessin vectoriel 2D des espèces animales (Femme, Vache, Souris, Brebis, Truie, Lapine)
+    function drawSpeciesFigure(type, cx, cy, col) {
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.fillStyle = col;
+      ctx.strokeStyle = col;
+      ctx.lineWidth = 3;
+
+      if (type === 'woman') {
+        // Silhouette féminine stylisée
+        ctx.beginPath(); ctx.arc(0, -32, 16, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(-22, 42); ctx.quadraticCurveTo(-25, 10, -16, -12);
+        ctx.quadraticCurveTo(0, -18, 16, -12); ctx.quadraticCurveTo(25, 10, 22, 42);
+        ctx.closePath(); ctx.fill();
+      } else if (type === 'cow') {
+        // Vache 2D (corps, tête, cornes, taches, pattes)
+        ctx.beginPath(); ctx.roundRect(-48, -14, 78, 42, 14); ctx.fill();
+        ctx.beginPath(); ctx.roundRect(22, -28, 32, 28, 10); ctx.fill();
+        // Cornes
+        ctx.beginPath(); ctx.moveTo(28, -28); ctx.quadraticCurveTo(22, -44, 34, -42); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(46, -28); ctx.quadraticCurveTo(52, -44, 40, -42); ctx.stroke();
+        // Pattes
+        [-38, -20, 10, 24].forEach(lx => ctx.fillRect(lx, 26, 7, 22));
+        // Tache blanche
+        ctx.fillStyle = '#FFFFFF';
+        ctx.beginPath(); ctx.ellipse(-12, 4, 16, 11, 0.3, 0, Math.PI * 2); ctx.fill();
+      } else if (type === 'mouse') {
+        // Souris 2D (corps arrondi, grandes oreilles, queue fine)
+        ctx.beginPath(); ctx.ellipse(0, 8, 34, 22, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(20, -12, 13, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(8, -15, 11, 0, Math.PI * 2); ctx.fillStyle = '#CBD5E1'; ctx.fill();
+        ctx.beginPath(); ctx.moveTo(-34, 12); ctx.quadraticCurveTo(-60, -8, -52, 26); ctx.stroke();
+      } else if (type === 'sheep') {
+        // Brebis 2D (toison nuageuse, tête, pattes)
+        [[-22, 0], [0, -6], [22, 0], [-12, 14], [12, 14]].forEach(([bx, by]) => {
+          ctx.beginPath(); ctx.arc(bx, by, 20, 0, Math.PI * 2); ctx.fill();
+        });
+        ctx.fillStyle = '#334155';
+        ctx.beginPath(); ctx.ellipse(36, -6, 15, 11, 0.2, 0, Math.PI * 2); ctx.fill();
+        [-22, -8, 10, 22].forEach(lx => ctx.fillRect(lx, 24, 6, 20));
+      } else if (type === 'pig') {
+        // Truie 2D (corps dodu, groin, queue en tire-bouchon)
+        ctx.beginPath(); ctx.ellipse(-4, 4, 46, 28, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(36, -4, 18, 0, Math.PI * 2); ctx.fill();
+        ctx.fillRect(50, -8, 10, 12); // Groin
+        ctx.beginPath(); ctx.arc(-54, -2, 8, 0, Math.PI * 1.6); ctx.stroke(); // Queue
+        [-30, -14, 12, 26].forEach(lx => ctx.fillRect(lx, 28, 7, 16));
+      } else if (type === 'rabbit') {
+        // Lapine 2D (corps, longues oreilles, pompon)
+        ctx.beginPath(); ctx.ellipse(-4, 12, 32, 22, -0.15, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(24, -4, 15, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(18, -32, 6, 20, -0.2, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(27, -30, 6, 20, 0.15, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(-38, 12, 9, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    function text(str, x, y, size = 26, color = C.ink, weight = '800', align = 'center') {
+      ctx.fillStyle = color;
+      ctx.font = `${weight} ${size}px Cairo`;
+      ctx.textAlign = align;
+      ctx.textBaseline = 'middle';
+      ctx.fillText(str, x, y);
+    }
+
+    function drawSilhouette(cx, cy, sc, color, isFemale) {
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.scale(sc, sc);
+      ctx.beginPath(); ctx.arc(0, 0, 140, 0, Math.PI * 2); ctx.fillStyle = color + '18'; ctx.fill();
+      ctx.beginPath(); ctx.arc(0, -68, 32, 0, Math.PI * 2); ctx.fillStyle = color; ctx.fill();
+      ctx.beginPath();
+      if (isFemale) {
+        ctx.moveTo(-40, 82); ctx.quadraticCurveTo(-46, 22, -32, -18);
+        ctx.quadraticCurveTo(0, -28, 32, -18); ctx.quadraticCurveTo(46, 22, 40, 82);
+      } else {
+        ctx.moveTo(-45, 82); ctx.lineTo(-42, -16);
+        ctx.quadraticCurveTo(0, -26, 42, -16); ctx.lineTo(45, 82);
+      }
+      ctx.closePath(); ctx.fillStyle = color; ctx.fill();
+      ctx.restore();
+    }
+
+    // Icônes anatomiques 2D pour la scène 1 (Ovaire, Utérus, Vagin, Hypophyse, Température)
+    function drawOrganIcon(type, cx, cy, col) {
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.strokeStyle = col;
+      ctx.fillStyle = col;
+      ctx.lineWidth = 2.5;
+
+      if (type === 'ovary') {
+        // Ovaire 2D avec petits follicules
+        ctx.beginPath(); ctx.ellipse(0, 0, 34, 21, 0, 0, Math.PI * 2);
+        ctx.fillStyle = '#FFCAD4'; ctx.fill(); ctx.stroke();
+        [[-14, -4, 5], [0, -7, 7], [14, 2, 10], [-4, 8, 4]].forEach(([fx, fy, fr]) => {
+          ctx.beginPath(); ctx.arc(fx, fy, fr, 0, Math.PI * 2);
+          ctx.fillStyle = fr === 10 ? '#FDBA74' : '#FDE68A'; ctx.fill();
+        });
+      } else if (type === 'uterus') {
+        // Utérus 2D en coupe avec trompes
+        ctx.beginPath();
+        ctx.moveTo(-22, -16); ctx.quadraticCurveTo(0, -24, 22, -16);
+        ctx.lineTo(13, 18); ctx.lineTo(-13, 18); ctx.closePath();
+        ctx.fillStyle = '#9E2A2B'; ctx.fill();
+        // Cavité utérine (endomètre)
+        ctx.beginPath();
+        ctx.moveTo(-12, -11); ctx.lineTo(12, -11); ctx.lineTo(5, 13); ctx.lineTo(-5, 13); ctx.closePath();
+        ctx.fillStyle = '#F28482'; ctx.fill();
+        // Trompes latérales
+        ctx.beginPath(); ctx.moveTo(-20, -14); ctx.quadraticCurveTo(-36, -18, -38, -4); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(20, -14); ctx.quadraticCurveTo(36, -18, 38, -4); ctx.stroke();
+      } else if (type === 'vagin') {
+        // Canal vaginal 2D stylisé et goutte de glaire
+        ctx.beginPath(); ctx.roundRect(-14, -20, 28, 40, 8);
+        ctx.fillStyle = '#FEF3C7'; ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(-6, -16); ctx.lineTo(-6, 16);
+        ctx.moveTo(6, -16); ctx.lineTo(6, 16); ctx.stroke();
+        ctx.beginPath(); ctx.arc(0, 2, 5, 0, Math.PI * 2);
+        ctx.fillStyle = C.mucus; ctx.fill();
+      } else if (type === 'pituitary') {
+        // Base du cerveau + glande hypophyse pendante
+        ctx.beginPath(); ctx.arc(0, -4, 24, Math.PI, Math.PI * 2);
+        ctx.fillStyle = '#F3E8FF'; ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, -4); ctx.lineTo(0, 8); ctx.stroke();
+        ctx.beginPath(); ctx.arc(0, 13, 8, 0, Math.PI * 2);
+        ctx.fillStyle = C.fsh; ctx.fill();
+      } else if (type === 'temp') {
+        // Thermomètre 2D
+        ctx.beginPath(); ctx.roundRect(-6, -24, 12, 34, 6);
+        ctx.fillStyle = '#FFFFFF'; ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.arc(0, 14, 10, 0, Math.PI * 2);
+        ctx.fillStyle = C.blood; ctx.fill();
+        ctx.fillRect(-3, -12, 6, 22);
+      }
+      ctx.restore();
+    }
+
+    // =========================================================================
+    // SCÈNE 1 : INTRODUCTION (00:00 -> 00:40.6)
+    // =========================================================================
+    function renderScene1(t) {
+      sceneBadge.textContent = "المشهد 1 : مقدمة — الدورة الجنسية | Introduction : Le cycle sexuel";
+      clearStage('الدورة الجنسية عند الأنثى', 'Le cycle sexuel féminin');
+
+      if (t < 26.4) {
+        const fade = 1 - prog(t, 25.6, 26.4);
+        ctx.save();
+        ctx.globalAlpha = fade;
+
+        if (t >= 4.2) {
+          box(810, 122, 300, 62, 26, '#FEF3C7', '#F59E0B', 3);
+          text('بداية البلوغ', 960, 142, 24, '#B45309');
+          text('Début de la puberté', 960, 168, 17, '#D97706');
+        }
+
+        // Gauche : Homme
+        box(100, 210, 780, 640, 32, '#FFFFFF', t >= 8 && t < 13.5 ? C.male : '#E2E8F0', 5);
+        drawSilhouette(490, 410, 1.05, C.male, false);
+        text('عند الذكر • Chez l\'homme', 490, 265, 30);
+
+        const mFlow = easeOut(prog(t, 8.16, 11.5));
+        if (mFlow > 0) {
+          const ex = lerp(180, 800, mFlow);
+          arrow(180, 650, ex, 650, C.male, 10, 22);
+          for (let px = 220; px < ex - 25; px += 65) {
+            ctx.beginPath(); ctx.arc(px, 650, 7, 0, Math.PI * 2); ctx.fillStyle = '#FFF'; ctx.fill();
+          }
+          text('عمل مستمر بلا علامات خارجية', 490, 725, 26, C.male);
+          text('Fonctionnement continu sans signes externes', 490, 765, 20, C.muted);
+        }
+
+        // Droite : Femme
+        box(1040, 210, 780, 640, 32, '#FFFFFF', t >= 13.5 ? C.cyan : '#E2E8F0', 5);
+        const shift = easeInOut(prog(t, 13.5, 14.8)) * 185;
+        drawSilhouette(1430 + shift, 410, 1.0, C.cyan, true);
+        text('عند الأنثى • Chez la femme', 1430, 265, 30);
+
+        const cPop = easeOut(prog(t, 14.0, 15.2));
+        if (cPop > 0) {
+          const cx = 1310, cy = 525, r = 160 * cPop;
+          ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.lineWidth = 26; ctx.strokeStyle = '#E0F2FE'; ctx.stroke();
+
+          const mGlow = easeOut(prog(t, 22.5, 23.5));
+          const sa = -Math.PI / 2;
+          ctx.beginPath(); ctx.arc(cx, cy, r, sa, sa + (5 / 28) * Math.PI * 2);
+          ctx.lineWidth = 28 + mGlow * 6;
+          ctx.strokeStyle = mGlow > 0 ? C.blood : '#FDA4AF';
+          ctx.stroke();
+
+          for (let d = 0; d < 28; d++) {
+            const ang = sa + (d / 28) * Math.PI * 2;
+            ctx.beginPath();
+            ctx.moveTo(cx + Math.cos(ang) * (r - 14), cy + Math.sin(ang) * (r - 14));
+            ctx.lineTo(cx + Math.cos(ang) * (r + 14), cy + Math.sin(ang) * (r + 14));
+            ctx.strokeStyle = '#FFF'; ctx.lineWidth = 2.5; ctx.stroke();
+          }
+
+          const hand = sa + prog(t, 15.0, 24.5) * Math.PI * 2;
+          arrow(cx, cy, cx + Math.cos(hand) * (r - 26), cy + Math.sin(hand) * (r - 26), C.cyan, 6, 14);
+          text('28 يوماً', cx, cy - 18, 32);
+          text('28 jours • Cyclique', cx, cy + 22, 20, C.cyan);
+
+          if (mGlow > 0) {
+            callout(1490, 545, 300, 82, 'الحيض (أيام 1 - 5)', 'Menstruation (J1 - J5)', C.blood, cx + 45, cy - 145, '#FEE2E2');
+          }
+        }
+        ctx.restore();
+      } else {
+        const cx = 960, cy = 435;
+        ctx.beginPath(); ctx.arc(cx, cy, 128, 0, Math.PI * 2); ctx.fillStyle = '#E0F2FE'; ctx.fill();
+        ctx.lineWidth = 8; ctx.strokeStyle = C.cyan; ctx.stroke();
+        text('تغيرات دورية', cx, cy - 22, 27);
+        text('Modifications cycliques', cx, cy + 8, 17, C.ink);
+        text('كل 28 يوماً • 28 jours', cx, cy + 38, 19, C.cyan);
+
+        const items = [
+          { id: 'ovary', lbl: 'المبيض', sub: 'Ovaire', tm: 29.08, x: 1470, y: 270, col: C.ovaryLine },
+          { id: 'uterus', lbl: 'الرحم', sub: 'Utérus', tm: 29.90, x: 1520, y: 515, col: C.myometrium },
+          { id: 'vagin', lbl: 'المهبل', sub: 'Vagin', tm: 30.70, x: 960, y: 685, col: '#D97706' },
+          { id: 'pituitary', lbl: 'هرمونات الغدة النخامية', sub: 'Hormones hypophysaires (FSH / LH)', tm: 31.60, x: 380, y: 515, col: C.fsh },
+          { id: 'temp', lbl: 'حرارة الجسم', sub: 'Température corporelle', tm: 32.80, x: 440, y: 270, col: C.orange }
+        ];
+        items.forEach(it => {
+          const pop = easeOut(prog(t, it.tm, it.tm + 0.65));
+          if (pop <= 0) return;
+          const ang = Math.atan2(it.y - cy, it.x - cx);
+          arrow(cx + Math.cos(ang) * 140, cy + Math.sin(ang) * 140,
+                lerp(cx + Math.cos(ang) * 140, it.x - Math.cos(ang) * 195, pop),
+                lerp(cy + Math.sin(ang) * 140, it.y - Math.sin(ang) * 95, pop), it.col, 5, 15);
+          ctx.save();
+          ctx.translate(it.x, it.y);
+          ctx.scale(0.85 + 0.15 * pop, 0.85 + 0.15 * pop);
+          ctx.globalAlpha = pop;
+          box(-210, -74, 420, 148, 24, '#FFFFFF', it.col, 4);
+          drawOrganIcon(it.id, 0, -40, it.col);
+          text(it.lbl, 0, 10, 23);
+          text(it.sub, 0, 44, 18, it.col, '800');
+          ctx.restore();
+        });
+
+        const life = easeOut(prog(t, 34.75, 38.8));
+        if (life > 0) {
+          box(180, 790, 1560, 150, 28, '#FFFFFF', '#CBD5E1', 3);
+          arrow(1600, 865, lerp(1600, 320, life), 865, C.cyan, 8, 20);
+          box(1440, 822, 260, 86, 20, '#DCFCE7', '#16A34A', 3);
+          text('البداية: البلوغ', 1570, 850, 23, '#15803D');
+          text('Début : Puberté', 1570, 882, 17, '#16A34A');
+          if (t >= 36.2) {
+            box(810, 822, 300, 86, 20, '#FEF3C7', '#D97706', 3);
+            text('توقف مؤقت: الحمل', 960, 850, 23, '#B45309');
+            text('Interruption : Grossesse', 960, 882, 17, '#D97706');
+          }
+          if (t >= 37.7) {
+            box(220, 822, 280, 86, 20, '#FEE2E2', '#DC2626', 3);
+            text('النهاية: سن اليأس', 360, 850, 23, '#B91C1C');
+            text('Fin : Ménopause', 360, 882, 17, '#DC2626');
+          }
+        }
+      }
+    }
+
+    // =========================================================================
+    // SCÈNE 2 : LE CYCLE OVARIEN COMPLET (00:40.6 -> 02:49.3 = 169.3s)
+    // =========================================================================
+    function renderScene2(t) {
+      // Sous-scène 2A & 2B : Phase folliculaire + Ovulation au ralenti (40.6s -> 86.5s)
+      if (t < 86.5) {
+        const isOv = t >= 57.8;
+        sceneBadge.textContent = isOv
+          ? "المشهد 2 (ب) : الإباضة (عرض بطيء) | Ovulation (Ralenti)"
+          : "المشهد 2 (أ) : دورة المبيض — المرحلة الجريبية | Phase folliculaire";
+        clearStage('أولاً : دورة المبيض', 'I. Le cycle ovarien');
+
+        // Barre des phases bilingue
+        box(1040, 122, 580, 68, 18, !isOv ? '#E0F2FE' : '#F1F5F9', !isOv ? C.cyan : '#CBD5E1', 4);
+        text('1. المرحلة الجريبية • Phase folliculaire', 1330, 156, 23, !isOv ? C.cyan : C.muted);
+        box(850, 122, 170, 68, 18, isOv ? '#FCE7F3' : '#F1F5F9', isOv ? '#DB2777' : '#CBD5E1', 4);
+        text('الإباضة • Ovulation', 935, 156, 21, isOv ? '#BE185D' : C.muted);
+        box(280, 122, 550, 68, 18, '#F1F5F9', '#CBD5E1', 3);
+        text('2. المرحلة الأصفرية • Phase lutéale', 555, 156, 23, C.muted);
+
+        // Zoom progressif sur le pôle ovulatoire
+        const ovZoom = easeInOut(prog(t, 57.8, 63.5));
+        ctx.save();
+        if (ovZoom > 0) {
+          const z = 1 + ovZoom * 0.65;
+          ctx.translate(1260, 490);
+          ctx.scale(z, z);
+          ctx.translate(-1260, -490);
+        }
+
+        // Ovaire 2D avec déformation (saillie du follicule mûr)
+        const bulge = easeInOut(prog(t, 61.0, 66.5)) * (1 - prog(t, 68.5, 71.0) * 0.4);
+        ctx.beginPath();
+        ctx.ellipse(840, 565, 490, 285, 0, 0, Math.PI * 2);
+        ctx.fillStyle = C.ovary;
+        ctx.fill();
+        ctx.lineWidth = 8;
+        ctx.strokeStyle = C.ovaryLine;
+        ctx.stroke();
+
+        // Légende de l'ovaire placée sous l'ovaire sans chevauchement
+        if (!isOv) {
+          text('مقطع في المبيض • Coupe de l\'ovaire', 840, 895, 24, '#9D174D');
+        }
+
+        // Saillie superficielle (stigma)
+        if (bulge > 0) {
+          ctx.beginPath();
+          ctx.arc(1255 + bulge * 38, 465 - bulge * 18, 95 + bulge * 25, -1.1, 1.3);
+          ctx.fillStyle = C.ovary;
+          ctx.fill();
+          ctx.lineWidth = Math.max(2, 8 - bulge * 5.5);
+          ctx.strokeStyle = C.ovaryLine;
+          ctx.stroke();
+        }
+
+        // Follicules secondaires (atrésie)
+        const growth = easeOut(prog(t, 49.9, 53.5));
+        const atresia = easeInOut(prog(t, 53.8, 57.2));
+        [{ x: 540, y: 470, r: 42 }, { x: 480, y: 620, r: 38 }, { x: 640, y: 710, r: 44 }, { x: 750, y: 390, r: 40 }].forEach(f => {
+          const r = lerp(12, f.r, growth) * (1 - atresia * 0.72);
+          ctx.save();
+          ctx.globalAlpha = 1 - atresia * 0.68;
+          ctx.beginPath(); ctx.arc(f.x, f.y, r, 0, Math.PI * 2);
+          ctx.fillStyle = atresia > 0.4 ? '#CBD5E1' : '#FDE68A'; ctx.fill();
+          ctx.lineWidth = 3; ctx.strokeStyle = atresia > 0.4 ? '#94A3B8' : '#D97706'; ctx.stroke();
+          ctx.restore();
+        });
+
+        // Follicule dominant -> rupture ovulatoire
+        const domG = easeInOut(prog(t, 49.9, 63.0));
+        const rupture = easeInOut(prog(t, 66.8, 70.5));
+        const domX = lerp(880, 1160, domG);
+        const domY = lerp(555, 475, domG);
+        const domR = lerp(18, 128, domG) * (1 - rupture * 0.25);
+
+        ctx.beginPath();
+        if (rupture > 0.1) {
+          ctx.arc(domX, domY, domR, 0.45 * rupture, Math.PI * 2 - 0.45 * rupture);
+        } else {
+          ctx.arc(domX, domY, domR, 0, Math.PI * 2);
+        }
+        ctx.fillStyle = '#FDBA74';
+        ctx.fill();
+        ctx.lineWidth = Math.max(2, 5 - rupture * 3);
+        ctx.strokeStyle = '#C2410C';
+        ctx.stroke();
+
+        // Cavité antrale
+        if (domG > 0.25 && rupture < 0.8) {
+          const aSc = clamp((domG - 0.25) / 0.75) * (1 - rupture);
+          ctx.beginPath();
+          ctx.arc(domX - domR * 0.12, domY + domR * 0.08, domR * 0.64 * aSc, 0, Math.PI * 2);
+          ctx.fillStyle = '#BAE6FD';
+          ctx.fill();
+        }
+
+        // Ovocyte II + Couronne de cellules de la granulosa (cumulus) + 1er globule polaire
+        const eject = easeOut(prog(t, 67.5, 73.5));
+        const ooX = domX + domR * 0.35 + eject * 210;
+        const ooY = domY - domR * 0.15 - eject * 55;
+        const ooR = lerp(8, 28, domG);
+
+        if (t >= 71.5) {
+          const cumPop = easeOut(prog(t, 71.5, 73.5));
+          for (let i = 0; i < 10; i++) {
+            const ang = (i / 10) * Math.PI * 2 + t * 0.4;
+            ctx.beginPath();
+            ctx.arc(ooX + Math.cos(ang) * (ooR + 10 * cumPop), ooY + Math.sin(ang) * (ooR + 10 * cumPop), 6 * cumPop, 0, Math.PI * 2);
+            ctx.fillStyle = '#FDBA74';
+            ctx.fill();
+          }
+        }
+
+        ctx.beginPath(); ctx.arc(ooX, ooY, ooR, 0, Math.PI * 2);
+        ctx.fillStyle = '#FEF08A'; ctx.fill();
+        ctx.lineWidth = 3.5; ctx.strokeStyle = '#CA8A04'; ctx.stroke();
+
+        if (t >= 75.0) {
+          const pbPop = easeOut(prog(t, 75.0, 76.5));
+          ctx.beginPath();
+          ctx.arc(ooX - ooR * 0.65, ooY - ooR * 0.65, 8 * pbPop, 0, Math.PI * 2);
+          ctx.fillStyle = '#F43F5E';
+          ctx.fill();
+        }
+
+        ctx.restore(); // fin zoom ovaire
+
+        // Annotations bilingues placées sur les marges extérieures pour ne jamais cacher le dessin
+        if (t >= 51.0 && t < 57.8) {
+          callout(1380, 230, 480, 92, 'الجريب المسيطر (يصل للنضج)', 'Follicule dominant (De Graaf)', '#C2410C', domX + 60, domY - 40, '#FFEDD5');
+          if (t >= 54.5) {
+            callout(60, 770, 430, 92, 'باقي الجريبات تضمر', 'Atrésie folliculaire (régression)', '#64748B', 480, 620, '#F1F5F9');
+          }
+        } else if (t >= 63.5) {
+          callout(1270, 215, 590, 90, 'الخلية البيضية الثانوية (إباضة)', 'Ovocyte II libéré (Ovulation)', '#DB2777', 1420, 410, '#FCE7F3');
+          if (t >= 72.0 && t < 76.0) {
+            callout(1270, 325, 590, 90, 'الكتلة الخلوية من الطبقة الحبيبية', 'Cumulus oophorus (Granulosa)', '#D97706', 1450, 420, '#FEF3C7');
+          }
+          if (t >= 76.0) {
+            callout(1270, 325, 590, 90, 'الكرية القطبية الأولى (انقسام منصف)', '1er globule polaire (Méiose reprise)', '#E11D48', 1435, 385, '#FFE4E6');
+          }
+          if (t >= 81.6) {
+            box(70, 880, 820, 92, 20, '#E0F2FE', C.cyan, 4);
+            text('تحدث الإباضة بعد 36 إلى 40 ساعة من الهرمونات المحرضة', 480, 910, 23, C.ink);
+            text('Ovulation : 36 à 40 h après le pic hormonal (LH)', 480, 945, 20, C.cyan);
+          }
+        }
+        return;
+      }
+
+      // Sous-scène 2C : Nombre d'ovocytes selon les espèces & alternance droite/gauche (86.5s -> 108.5s)
+      if (t < 108.5) {
+        sceneBadge.textContent = "المشهد 2 (ج) : اختلاف عدد البويضات حسب النوع | Nombre d'ovocytes par espèce";
+        clearStage('عدد الخلايا البيضية المحررة حسب النوع', 'Nombre d\'ovocytes libérés selon l\'espèce');
+
+        if (t < 103.5) {
+          const species = [
+            { type: 'woman', name: 'المرأة • Femme', count: '1', sub: 'بويضة واحدة • 1 ovocyte', tm: 90.7, x: 1600, y: 380, col: C.cyan },
+            { type: 'cow', name: 'البقرة • Vache', count: '1', sub: 'بويضة واحدة • 1 ovocyte', tm: 91.6, x: 1170, y: 380, col: '#D97706' },
+            { type: 'mouse', name: 'الفأرة • Souris', count: '8 - 10', sub: 'بويضات • ovocytes', tm: 93.5, x: 740, y: 380, col: '#64748B' },
+            { type: 'sheep', name: 'النعجة • Brebis', count: '2', sub: 'بويضتان • 2 ovocytes', tm: 95.8, x: 310, y: 380, col: '#10B981' },
+            { type: 'pig', name: 'الخنزيرة • Truie', count: '8 - 30', sub: 'بويضة • ovocytes', tm: 98.2, x: 1240, y: 760, col: '#EC4899' },
+            { type: 'rabbit', name: 'الأرنبة • Lapine', count: '6 - 17', sub: 'بويضة • ovocytes', tm: 100.5, x: 680, y: 760, col: '#8B5CF6' }
+          ];
+          species.forEach(sp => {
+            const p = easeOut(prog(t, sp.tm, sp.tm + 0.6));
+            if (p <= 0) return;
+            ctx.save();
+            ctx.translate(sp.x, sp.y);
+            ctx.scale(0.85 + 0.15 * p, 0.85 + 0.15 * p);
+            ctx.globalAlpha = p;
+            box(-195, -165, 390, 330, 28, '#FFFFFF', sp.col, 5);
+            // Badge quantité en haut
+            box(-95, -148, 190, 56, 18, sp.col + '20', sp.col, 3);
+            text(sp.count, 0, -120, 34, sp.col);
+            // Illustration 2D de l'espèce au centre
+            drawSpeciesFigure(sp.type, 0, -18, sp.col);
+            // Nom bilingue lisible en bas de carte
+            text(sp.name, 0, 72, 26, C.ink);
+            text(sp.sub, 0, 118, 21, sp.col, '700');
+            ctx.restore();
+          });
+        } else {
+          const alt = Math.sin((t - 103.6) * 4) > 0;
+          box(280, 240, 1360, 590, 36, '#FFFFFF', '#CBD5E1', 4);
+          text('عند المرأة : تتناوب الإباضة غالباً بين المبيضين', 960, 300, 30);
+          text('Alternance habituelle entre l\'ovaire droit et l\'ovaire gauche', 960, 342, 21, C.cyan);
+
+          ctx.beginPath(); ctx.ellipse(620, 540, 170, 105, 0, 0, Math.PI * 2);
+          ctx.fillStyle = alt ? '#FDA4AF' : C.ovary; ctx.fill();
+          ctx.lineWidth = alt ? 8 : 4; ctx.strokeStyle = C.ovaryLine; ctx.stroke();
+          text('المبيض الأيمن', 620, 685, 27);
+          text('Ovaire droit', 620, 722, 20, C.muted);
+          if (alt) {
+            ctx.beginPath(); ctx.arc(620, 410, 20, 0, Math.PI * 2); ctx.fillStyle = '#FEF08A'; ctx.fill();
+            ctx.strokeStyle = '#CA8A04'; ctx.lineWidth = 3; ctx.stroke();
+          }
+
+          arrow(840, 515, 1080, 515, C.cyan, 6, 18);
+          arrow(1080, 565, 840, 565, C.cyan, 6, 18);
+          text('تناوب شهري', 960, 460, 23, C.cyan);
+          text('Alternance', 960, 490, 18, C.muted);
+
+          ctx.beginPath(); ctx.ellipse(1300, 540, 170, 105, 0, 0, Math.PI * 2);
+          ctx.fillStyle = !alt ? '#FDA4AF' : C.ovary; ctx.fill();
+          ctx.lineWidth = !alt ? 8 : 4; ctx.strokeStyle = C.ovaryLine; ctx.stroke();
+          text('المبيض الأيسر', 1300, 685, 27);
+          text('Ovaire gauche', 1300, 722, 20, C.muted);
+          if (!alt) {
+            ctx.beginPath(); ctx.arc(1300, 410, 20, 0, Math.PI * 2); ctx.fillStyle = '#FEF08A'; ctx.fill();
+            ctx.strokeStyle = '#CA8A04'; ctx.lineWidth = 3; ctx.stroke();
+          }
+        }
+        return;
+      }
+
+      // Sous-scène 2D : Ovulation spontanée vs provoquée (108.5s -> 125.1s)
+      if (t < 125.1) {
+        sceneBadge.textContent = "المشهد 2 (د) : الإباضة التلقائية والمحرضة | Ovulation spontanée vs provoquée";
+        clearStage('نوعا الإباضة عند الثدييات', 'Les deux modes d\'ovulation chez les mammifères');
+
+        const spActive = t < 117.0;
+        box(120, 175, 780, 730, 32, '#FFFFFF', spActive ? C.cyan : '#CBD5E1', spActive ? 6 : 3);
+        text('1. إباضة تلقائية • Ovulation spontanée', 510, 235, 29, C.cyan);
+        text('معظم الثدييات (المرأة، البقرة، الفأرة...)', 510, 285, 22, C.ink);
+        text('Majorité des mammifères (Femme, Vache, Souris...)', 510, 318, 18, C.muted);
+
+        ctx.beginPath(); ctx.arc(510, 515, 125, 0, Math.PI * 2);
+        ctx.lineWidth = 14; ctx.strokeStyle = '#BAE6FD'; ctx.stroke();
+        const ang1 = -Math.PI / 2 + ((t * 1.5) % (Math.PI * 2));
+        arrow(510, 515, 510 + Math.cos(ang1) * 100, 515 + Math.sin(ang1) * 100, C.cyan, 6, 16);
+        box(210, 705, 600, 140, 20, '#E0F2FE', C.cyan, 3);
+        text('تحدث تلقائياً في نهاية المرحلة الجريبية', 510, 745, 23, C.ink);
+        text('Se produit automatiquement en fin de phase folliculaire', 510, 780, 17, C.cyan);
+        text('دون الحاجة إلى تزاوج • Sans accouplement', 510, 815, 19, C.ink);
+
+        const prPop = easeOut(prog(t, 117.0, 118.0));
+        ctx.save();
+        ctx.globalAlpha = 0.35 + 0.65 * prPop;
+        box(1020, 175, 780, 730, 32, '#FFFFFF', !spActive ? C.orange : '#CBD5E1', !spActive ? 6 : 3);
+        text('2. إباضة محرضة • Ovulation provoquée', 1410, 235, 29, C.orange);
+        text('مثل : القطة والأرنبة • Ex : Chatte et Lapine', 1410, 285, 23, '#B45309');
+
+        box(1140, 355, 540, 86, 20, '#FEF3C7', '#F59E0B', 3);
+        text('منبه التزاوج (إشارة عصبية)', 1410, 385, 23, '#B45309');
+        text('Stimulus de l\'accouplement (voie nerveuse)', 1410, 418, 17, '#D97706');
+        arrow(1410, 446, 1410, 518, C.orange, 6, 16);
+        box(1140, 522, 540, 86, 20, '#F3E8FF', C.fsh, 3);
+        text('إفراز هرمونات الغدة النخامية (LH)', 1410, 552, 23, C.fsh);
+        text('Décharge hormonale hypophysaire', 1410, 585, 17, C.fsh);
+        arrow(1410, 613, 1410, 685, C.orange, 6, 16);
+        box(1140, 690, 540, 115, 20, '#FFEDD5', C.orange, 3);
+        text('تحرير البويضات من المبيض', 1410, 732, 25, '#9A3412');
+        text('Libération des ovocytes par l\'ovaire', 1410, 772, 18, C.orange);
+        ctx.restore();
+        return;
+      }
+
+      // Sous-scène 2E : Phase lutéale -> Corps jaune -> Corps blanc vs Gestatif (125.1s -> 169.3s)
+      sceneBadge.textContent = "المشهد 2 (هـ) : المرحلة الأصفرية | Phase lutéale et devenir du corps jaune";
+      clearStage('2. المرحلة الأصفرية', '2. La phase lutéale');
+
+      const splitScenarios = t >= 147.2;
+
+      if (!splitScenarios) {
+        const form = easeInOut(prog(t, 129.8, 136.0));
+        // Ovaire décalé à gauche pour laisser toute la colonne droite aux légendes
+        ctx.beginPath(); ctx.ellipse(660, 550, 440, 270, 0, 0, Math.PI * 2);
+        ctx.fillStyle = C.ovary; ctx.fill(); ctx.lineWidth = 8; ctx.strokeStyle = C.ovaryLine; ctx.stroke();
+
+        const clR = lerp(95, 155, form);
+        ctx.beginPath(); ctx.arc(730, 540, clR, 0, Math.PI * 2);
+        ctx.fillStyle = form > 0.3 ? C.corpusLuteum : '#FDBA74';
+        ctx.fill(); ctx.lineWidth = 6; ctx.strokeStyle = '#D97706'; ctx.stroke();
+
+        // Caillot sanguin central (139.6s)
+        ctx.beginPath(); ctx.arc(730, 540, clR * 0.28, 0, Math.PI * 2);
+        ctx.fillStyle = C.blood; ctx.fill();
+
+        // Vaisseaux sanguins (134.8s)
+        if (t >= 134.5) {
+          const vPop = easeOut(prog(t, 134.5, 137.0));
+          for (let i = 0; i < 8; i++) {
+            const a = (i / 8) * Math.PI * 2;
+            const r1 = clR + 25;
+            const r2 = lerp(r1, clR * 0.45, vPop);
+            ctx.beginPath();
+            ctx.moveTo(730 + Math.cos(a) * r1, 540 + Math.sin(a) * r1);
+            ctx.lineTo(730 + Math.cos(a) * r2, 540 + Math.sin(a) * r2);
+            ctx.strokeStyle = C.blood; ctx.lineWidth = 4; ctx.stroke();
+          }
+          callout(1230, 440, 580, 96, 'أوعية دموية تغذي الخلايا الأصفرية', 'Vascularisation et cellules lutéales', C.blood, 730 + clR * 0.7, 540 - clR * 0.2, '#FEE2E2');
+        }
+
+        if (t >= 139.6) {
+          callout(1230, 630, 580, 96, 'تجويف وسطي فيه جلطة دموية', 'Cavité centrale avec caillot sanguin', '#991B1B', 730, 540, '#FEF2F2');
+        }
+
+        callout(1230, 250, 580, 98, 'الجسم الأصفر (يتكون في ساعات)', 'Corps jaune (Corpus luteum)', '#B45309', 730, 540 - clR * 0.85, '#FEF9C3');
+      } else {
+        const s1Focus = t < 160.8;
+        box(1010, 145, 810, 845, 32, '#FFFFFF', s1Focus ? C.muted : '#E2E8F0', s1Focus ? 6 : 3);
+        text('الحالة 1 : عدم حدوث إخصاب', 1415, 200, 28, C.ink);
+        text('Scénario 1 : Absence de fécondation', 1415, 238, 22, C.muted);
+
+        const reg = easeInOut(prog(t, 147.5, 156.5));
+        ctx.beginPath(); ctx.ellipse(1510, 445, 230, 145, 0, 0, Math.PI * 2);
+        ctx.fillStyle = C.ovary; ctx.fill(); ctx.lineWidth = 5; ctx.strokeStyle = C.ovaryLine; ctx.stroke();
+
+        const r1 = lerp(90, 26, reg);
+        ctx.beginPath(); ctx.arc(1540, 440, r1, 0, Math.PI * 2);
+        ctx.fillStyle = reg < 0.45 ? C.corpusLuteum : (reg < 0.85 ? C.corpusAlbicans : '#CBD5E1');
+        ctx.fill(); ctx.lineWidth = 4; ctx.strokeStyle = '#94A3B8'; ctx.stroke();
+
+        // Légende placée à gauche de l'ovaire sans le recouvrir
+        arrow(1250, 440, 1540 - r1 - 14, 440, '#475569', 5, 14);
+        text(reg > 0.8 ? 'ندبة' : 'الجسم الأبيض', 1140, 425, 22, '#475569');
+        text(reg > 0.8 ? 'Cicatrice' : 'Corps blanc', 1140, 458, 20, C.cyan);
+
+        box(1060, 645, 710, 290, 22, '#F1F5F9', '#94A3B8', 3);
+        text('يتراجع الجسم الأصفر الدوري ويفقد لونه', 1415, 695, 24);
+        text('يتحول إلى كتلة ليفية : الجسم الأبيض (Corps blanc)', 1415, 748, 23, '#475569');
+        text('ثم يزول ولا تبقى إلا ندبة صغيرة (Cicatrice)', 1415, 800, 22, C.muted);
+        text('Corps jaune cyclique → Régression en corps blanc', 1415, 865, 21, C.cyan);
+
+        const s2Pop = easeOut(prog(t, 160.8, 162.0));
+        ctx.save();
+        ctx.globalAlpha = 0.3 + 0.7 * s2Pop;
+        box(100, 145, 810, 845, 32, '#FFFFFF', !s1Focus ? '#EAB308' : '#E2E8F0', !s1Focus ? 6 : 3);
+        text('الحالة 2 : حدوث إخصاب وتعشيش الجنين', 505, 200, 28, '#854D0E');
+        text('Scénario 2 : Fécondation et nidation de l\'embryon', 505, 238, 22, '#B45309');
+
+        const growCL = easeOut(prog(t, 161.5, 167.5));
+        ctx.beginPath(); ctx.ellipse(600, 445, 240, 150, 0, 0, Math.PI * 2);
+        ctx.fillStyle = C.ovary; ctx.fill(); ctx.lineWidth = 5; ctx.strokeStyle = C.ovaryLine; ctx.stroke();
+
+        const r2 = lerp(90, 125, growCL);
+        ctx.beginPath(); ctx.arc(620, 440, r2, 0, Math.PI * 2);
+        ctx.fillStyle = C.corpusLuteum; ctx.fill(); ctx.lineWidth = 6; ctx.strokeStyle = '#CA8A04'; ctx.stroke();
+        arrow(330, 440, 620 - r2 - 14, 440, '#CA8A04', 5, 14);
+        text('نمو واستمرار', 225, 425, 22, '#854D0E');
+        text('Persistance', 225, 458, 20, '#B45309');
+
+        box(150, 645, 710, 290, 22, '#FEF9C3', '#EAB308', 4);
+        text('استقرار الجنين في الرحم (Nidation)', 505, 695, 24, '#854D0E');
+        text('يبقى الجسم الأصفر ويكبر ويستمر في الإفراز', 505, 748, 23, C.ink);
+        text('يُسمى : الجسم الأصفر الحملي', 505, 800, 26, '#B45309');
+        text('Corps jaune gestatif (maintien de la grossesse)', 505, 865, 21, '#92400E');
+        ctx.restore();
+      }
+    }
+
+    // =========================================================================
+    // SCÈNE 3 : HORMONES OVARIENNES (02:49.3 -> 03:11.9 = 191.9s)
+    // =========================================================================
+    function renderScene3(t) {
+      sceneBadge.textContent = "المشهد 3 : منحنيات هرمونات المبيض | Hormones ovariennes (28 jours)";
+      clearStage('تطور هرمونات المبيض خلال الدورة', 'Évolution des hormones ovariennes (Œstrogènes et Progestérone)');
+
+      const gx = 260, gy = 175, gw = 1440, gh = 680;
+      box(gx - 60, gy - 35, gw + 120, gh + 145, 32, '#FFFFFF', '#CBD5E1', 4);
+
+      arrow(gx, gy + gh, gx, gy, C.ink, 5, 16);
+      arrow(gx, gy + gh, gx + gw, gy + gh, C.ink, 5, 16);
+      text('أيام الدورة (28 يوماً) • Jours du cycle', gx + gw / 2, gy + gh + 75, 25);
+      text('التركيز • Concentration', gx - 10, gy - 18, 20, C.muted);
+
+      const ovX = gx + (14 / 28) * gw;
+      ctx.save();
+      ctx.setLineDash([10, 10]);
+      ctx.strokeStyle = '#DB2777';
+      ctx.lineWidth = 4;
+      ctx.beginPath(); ctx.moveTo(ovX, gy + 35); ctx.lineTo(ovX, gy + gh); ctx.stroke();
+      ctx.restore();
+      text('الإباضة • Ovulation (J14)', ovX, gy + 18, 22, '#BE185D');
+
+      [1, 7, 13, 14, 21, 28].forEach(d => {
+        const px = gx + (d / 28) * gw;
+        text(`J${d}`, px, gy + gh + 32, 22, C.muted);
+      });
+
+      const estroY = (day) => {
+        const base = 0.14;
+        const p1 = 0.78 * Math.exp(-Math.pow((day - 12.8) / 2.2, 2));
+        const p2 = 0.44 * Math.exp(-Math.pow((day - 21.0) / 3.4, 2));
+        const val = clamp(base + p1 + p2, 0.08, 0.95);
+        return gy + gh - val * (gh - 80);
+      };
+
+      const progY = (day) => {
+        const base = 0.05;
+        const p = 0.82 * Math.exp(-Math.pow((day - 21.0) / 4.2, 2)) * (day > 12 ? clamp((day - 12) / 3) : 0);
+        return gy + gh - (base + p) * (gh - 80);
+      };
+
+      const estroDayLimit = lerp(1, 28, prog(t, 172.6, 185.5));
+      const progDayLimit = t >= 185.6 ? lerp(1, 28, prog(t, 185.6, 191.0)) : 0;
+
+      if (estroDayLimit > 1) {
+        ctx.beginPath();
+        for (let d = 1; d <= estroDayLimit; d += 0.2) {
+          const px = gx + (d / 28) * gw;
+          const py = estroY(d);
+          d === 1 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+        }
+        ctx.strokeStyle = C.cyan;
+        ctx.lineWidth = 8;
+        ctx.stroke();
+
+        // Pointage visuel du pic pré-ovulatoire J13 (176s+)
+        if (estroDayLimit >= 13) {
+          const px13 = gx + (12.8 / 28) * gw;
+          const py13 = estroY(12.8);
+          ctx.beginPath(); ctx.arc(px13, py13, 12, 0, Math.PI * 2); ctx.fillStyle = C.cyan; ctx.fill();
+          text('ذروة قبل الإباضة • Pic J13', px13 - 135, py13, 20, C.cyan);
+        }
+        // Pointage du 2e rebond lutéal J21 (182s+)
+        if (estroDayLimit >= 21) {
+          const px21 = gx + (21 / 28) * gw;
+          const py21 = estroY(21);
+          ctx.beginPath(); ctx.arc(px21, py21, 10, 0, Math.PI * 2); ctx.fillStyle = C.cyan; ctx.fill();
+          text('ارتفاع ثانٍ • 2e hausse', px21 + 125, py21 - 25, 19, C.cyan);
+        }
+      }
+
+      if (progDayLimit > 1) {
+        ctx.beginPath();
+        for (let d = 1; d <= progDayLimit; d += 0.2) {
+          const px = gx + (d / 28) * gw;
+          const py = progY(d);
+          d === 1 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+        }
+        ctx.strokeStyle = C.orange;
+        ctx.lineWidth = 8;
+        ctx.stroke();
+
+        if (progDayLimit >= 21) {
+          const px21 = gx + (21 / 28) * gw;
+          const py21 = progY(21);
+          ctx.beginPath(); ctx.arc(px21, py21, 12, 0, Math.PI * 2); ctx.fillStyle = C.orange; ctx.fill();
+          text('ذروة البروجسترون • Plateau lutéal', px21 + 165, py21 - 25, 20, C.orange);
+        }
+      }
+
+      box(300, 205, 360, 74, 18, '#E0F2FE', C.cyan, 4);
+      text('الإستروجين', 480, 230, 23, C.cyan);
+      text('Œstrogènes (Œstradiol)', 480, 258, 17, C.ink);
+
+      if (t >= 185.6) {
+        box(300, 292, 360, 74, 18, '#FFEDD5', C.orange, 4);
+        text('البروجسترون', 480, 317, 23, C.orange);
+        text('Progestérone', 480, 345, 17, C.ink);
+      }
+    }
+
+    // =========================================================================
+    // SCÈNE 4 : LE CYCLE UTÉRIN (03:11.9 -> 05:32.7 = 332.7s)
+    // =========================================================================
+    function renderScene4(t) {
+      sceneBadge.textContent = "المشهد 4 : دورة الرحم وتغيرات البطانة | Cycle utérin et endomètre";
+      clearStage('ثانياً : دورة الرحم', 'II. Le cycle utérin');
+
+      let phaseAr = "جزآ جدار الرحم : العضلة الرحمية والبطانة";
+      let phaseFr = "Structure de la paroi utérine : Myomètre et Endomètre";
+      let dayLabel = "مقطع • Coupe";
+      let thickMm = 3.0;
+      let glandsCurl = 0.2;
+      let hasGlycogen = false;
+      let isShedding = false;
+      let silenceUterin = false;
+
+      if (t < 214.8) {
+        thickMm = 3.5;
+      } else if (t < 233.8) {
+        phaseAr = "1. مرحلة الانسلاخ (الحيض) — الأيام 1 إلى 5";
+        phaseFr = "1. Phase menstruelle (Règles) — J1 à J5";
+        dayLabel = "J1 - J5";
+        thickMm = lerp(7.5, 0.5, prog(t, 214.8, 231.0));
+        isShedding = true;
+      } else if (t < 240.8) {
+        phaseAr = "2. مرحلة التجدد — الأيام 5 إلى 8";
+        phaseFr = "2. Phase de régénération — J5 à J8";
+        dayLabel = "J5 - J8";
+        thickMm = lerp(0.5, 1.3, prog(t, 233.8, 240.5));
+      } else if (t < 259.8) {
+        phaseAr = "3. مرحلة التكاثر — الأيام 9 إلى 14";
+        phaseFr = "3. Phase proliférative — J9 à J14";
+        dayLabel = "J9 - J14";
+        thickMm = lerp(1.3, 3.0, prog(t, 240.8, 256.5));
+        glandsCurl = lerp(0.1, 0.45, prog(t, 240.8, 256.5));
+      } else if (t < 275.0) {
+        phaseAr = "4. مرحلة التحول الغدي — الأيام 15 إلى 21";
+        phaseFr = "4. Transformation glandulaire — J15 à J21";
+        dayLabel = "J15 - J21";
+        thickMm = lerp(3.0, 5.8, prog(t, 259.8, 274.5));
+        glandsCurl = lerp(0.45, 0.78, prog(t, 259.8, 274.5));
+        hasGlycogen = t >= 271.3;
+      } else if (t < 305.0) {
+        phaseAr = "5. مرحلة الإفراز (المهيئة للحمل) — الأيام 22 إلى 28";
+        phaseFr = "5. Phase sécrétoire (Progestative) — J22 à J28";
+        dayLabel = "J22 - J28";
+        thickMm = lerp(5.8, 8.0, prog(t, 275.0, 289.0));
+        glandsCurl = 1.0;
+        hasGlycogen = true;
+        silenceUterin = t >= 295.0;
+      } else {
+        phaseAr = "نهاية الدورة في غياب التعشيش : عودة الحيض";
+        phaseFr = "Fin du cycle sans nidation : retour des règles";
+        dayLabel = "J28 → J1";
+        thickMm = lerp(8.0, 0.5, prog(t, 305.0, 318.6));
+        isShedding = t < 323.5;
+        if (t >= 324.0) {
+          thickMm = lerp(0.5, 2.0, prog(t, 324.0, 331.0));
+          dayLabel = "دورة جديدة";
+        }
+      }
+
+      box(200, 120, 1520, 78, 22, '#FFFFFF', C.myometrium, 4);
+      text(phaseAr, 1080, 146, 26, C.myometrium);
+      text(phaseFr, 1080, 178, 19, C.muted);
+      box(230, 132, 220, 54, 16, '#FEE2E2', C.blood, 3);
+      text(dayLabel, 340, 160, 23, C.blood);
+
+      const wx = 340, ww = 1240, baseY = 955;
+      box(wx - 40, 215, ww + 80, 775, 32, '#FFFFFF', '#CBD5E1', 4);
+
+      // 1. Myomètre
+      const myoH = 145;
+      box(wx, baseY - myoH, ww, myoH, [0, 0, 24, 24], C.myometrium);
+      text('العضلة الرحمية (Myomètre) — طبقة عضلية سميكة (Couche musculaire épaisse)', wx + ww / 2, baseY - myoH / 2, 23, '#FFFFFF');
+
+      // 2. Couche résiduelle (0.5 mm)
+      const resH = 38;
+      const resY = baseY - myoH - resH;
+      ctx.fillStyle = '#E56B6F';
+      ctx.fillRect(wx, resY, ww, resH);
+
+      // 3. Couche fonctionnelle de l'endomètre
+      const funcH = Math.max(0, (thickMm - 0.5) * 53);
+      const topY = resY - funcH;
+      ctx.fillStyle = C.endometrium;
+      ctx.fillRect(wx, topY, ww, funcH);
+
+      // Glandes utérines & artérioles spiralées
+      const cols = 7;
+      for (let i = 0; i < cols; i++) {
+        const cx = wx + (i + 0.5) * (ww / cols);
+
+        if (funcH > 12) {
+          ctx.beginPath();
+          const steps = 16;
+          for (let s = 0; s <= steps; s++) {
+            const p = s / steps;
+            const gy = topY + p * (funcH + resH - 12);
+            const wave = Math.sin(p * Math.PI * (1 + glandsCurl * 6)) * (4 + glandsCurl * 26);
+            s === 0 ? ctx.moveTo(cx + wave, gy) : ctx.lineTo(cx + wave, gy);
+          }
+          ctx.strokeStyle = '#9D174D';
+          ctx.lineWidth = 6;
+          ctx.stroke();
+
+          if (hasGlycogen) {
+            for (let g = 0; g < 4; g++) {
+              const gy = topY + 25 + ((g * 45 + t * 35) % Math.max(30, funcH));
+              ctx.beginPath();
+              ctx.arc(cx - 18 + Math.sin(g + t * 3) * 14, gy, 6, 0, Math.PI * 2);
+              ctx.fillStyle = C.glycogen;
+              ctx.fill();
+            }
+          }
+        }
+
+        ctx.beginPath();
+        ctx.moveTo(cx + 32, baseY - myoH + 10);
+        const aSteps = 20;
+        for (let s = 1; s <= aSteps; s++) {
+          const p = s / aSteps;
+          const spiral = Math.sin(p * Math.PI * (2 + glandsCurl * 8)) * (6 + glandsCurl * 22);
+          ctx.lineTo(cx + 32 + spiral, (baseY - myoH) - p * (funcH + resH - 10));
+        }
+        ctx.strokeStyle = C.blood;
+        ctx.lineWidth = 4.5;
+        ctx.stroke();
+      }
+
+      if (isShedding) {
+        for (let k = 0; k < 18; k++) {
+          const fx = wx + 60 + ((k * 73) % (ww - 120));
+          const fy = topY - 20 - ((t * 90 + k * 41) % 130);
+          ctx.beginPath();
+          ctx.arc(fx, fy, 7 + (k % 5), 0, Math.PI * 2);
+          ctx.fillStyle = k % 2 === 0 ? C.blood : C.endometrium;
+          ctx.fill();
+        }
+        box(580, 240, 760, 76, 18, '#FEE2E2', C.blood, 3);
+        text('انسلاخ البطانة وتمزق الأوعية = الحيض', 960, 266, 24, C.blood);
+        text('Desquamation de la muqueuse = Menstruation', 960, 296, 18, '#991B1B');
+      }
+
+      // Indicateur d'épaisseur dynamique en mm + couche résiduelle
+      arrow(wx - 22, resY + resH, wx - 22, topY, C.ink, 4, 12);
+      box(85, Math.max(245, topY - 25), 195, 72, 16, '#FEF2F2', C.blood, 3);
+      text(`${thickMm.toFixed(1)} mm`, 182, Math.max(270, topY - 2), 25, C.blood);
+      text('السمك • Épaisseur', 182, Math.max(300, topY + 26), 16, C.muted);
+
+      // Désignation précise des structures citées (placées dans la zone haute libre de la cavité utérine)
+      if (t < 214.8) {
+        callout(1130, 245, 420, 90, 'بطانة الرحم (مخاطية داخلية)', 'Endomètre (Muqueuse interne)', '#9F1239', wx + ww * 0.72, topY + funcH * 0.45, '#FFE4E6');
+      } else if (t >= 230.0 && t < 240.8) {
+        callout(1130, 245, 420, 90, 'الطبقة القاعدية الباقية (0.5 mm)', 'Couche résiduelle (0,5 mm)', '#BE123C', wx + ww * 0.75, resY + resH * 0.5, '#FFF1F2');
+      } else if (t >= 244.0 && t < 271.0) {
+        callout(1130, 245, 420, 90, 'استطالة الغدد وتلولب الشرايين', 'Glandes sinueuses & artérioles spiralées', '#9D174D', wx + ww * 0.78, topY + funcH * 0.35, '#FDF2F8');
+      }
+      if (hasGlycogen && !isShedding) {
+        callout(1130, 245, 420, 90, 'إفراز الغليكوجين المغذي', 'Sécrétion de glycogène nutritif', '#B45309', wx + ww * 0.78, topY + funcH * 0.35, '#FEF3C7');
+      }
+      if (silenceUterin) {
+        box(360, 245, 520, 90, 18, '#DCFCE7', '#16A34A', 4);
+        text('الهدوء الرحمي (توقف الانقباضات)', 620, 273, 23, '#15803D');
+        text('Silence utérin (arrêt des contractions)', 620, 307, 19, '#166534');
+      }
+      if (t >= 319.2 && t < 324.0) {
+        box(360, 345, 1200, 78, 18, '#F1F5F9', '#64748B', 3);
+        text('عند معظم الثدييات : يتراجع التضخم دون نزيف خارجي ظاهر', 960, 372, 23, C.ink);
+        text('Chez la majorité des mammifères : régression sans saignement externe', 960, 404, 19, C.muted);
+      }
+    }
+
+    // =========================================================================
+    // SCÈNE 5 : LE MUCUS CERVICAL (05:32.7 -> 06:41.8 = 401.8s)
+    // =========================================================================
+    function renderScene5(t) {
+      sceneBadge.textContent = "المشهد 5 : المخاط العنقي وأدواره الثلاثة | Glaire cervicale et ses 3 rôles";
+      clearStage('ثالثاً : المخاط العنقي', 'III. La glaire cervicale (Mucus cervical)');
+
+      let openness = 0.15;
+      let stateAr = "بداية الدورة : مخاط قليل وكثيف (شبكة ضيقة)";
+      let stateFr = "Début du cycle : glaire peu abondante et épaisse (mailles serrées)";
+      if (t >= 342.9 && t < 363.0) {
+        openness = lerp(0.2, 1.0, prog(t, 342.9, 351.0));
+        stateAr = "عند الإباضة (تأثير الإستروجين) : مخاط صافٍ، خيطي، قاعدي وشبكته واسعة";
+        stateFr = "À l'ovulation (Œstrogènes) : glaire limpide, filante, alcaline, mailles larges";
+      } else if (t >= 363.0) {
+        openness = lerp(1.0, 0.12, prog(t, 363.0, 367.5));
+        stateAr = "خارج الإباضة (تأثير البروجسترون) : مخاط كثيف وشبكة ضيقة واقية";
+        stateFr = "Hors ovulation (Progestérone) : glaire épaisse à mailles serrées (barrière)";
+      }
+
+      box(220, 120, 1480, 78, 20, '#FFFFFF', C.mucus, 4);
+      text(stateAr, 960, 146, 24, C.ink);
+      text(stateFr, 960, 178, 18, C.cyan);
+
+      const cx = 620, cy = 225, cw = 1160, ch = 575;
+      box(cx, cy, cw, ch, 32, openness > 0.6 ? '#F0F9FF' : '#E0F2FE', C.mucus, 5);
+
+      ctx.fillStyle = '#F28482';
+      ctx.fillRect(cx, cy, cw, 56);
+      ctx.fillRect(cx, cy + ch - 56, cw, 56);
+      text('جدار عنق الرحم وغدده المفرزة للمخاط • Paroi et glandes du col de l\'utérus', cx + cw / 2, cy + 28, 20, '#FFFFFF');
+      text('تجويف عنق الرحم • Canal cervical', cx + cw / 2, cy + ch - 28, 20, '#FFFFFF');
+
+      const spacing = lerp(24, 78, openness);
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(cx + 10, cy + 56, cw - 20, ch - 112);
+      ctx.clip();
+
+      ctx.strokeStyle = openness > 0.6 ? '#7DD3FC' : '#0284C7';
+      ctx.lineWidth = lerp(4.5, 2.2, openness);
+      for (let y = cy + 65; y < cy + ch - 56; y += spacing) {
+        ctx.beginPath();
+        for (let x = cx; x <= cx + cw; x += 40) {
+          const wave = Math.sin(x * 0.015 + t * 2 + y * 0.05) * (openness > 0.6 ? 6 : 16);
+          x === cx ? ctx.moveTo(x, y + wave) : ctx.lineTo(x, y + wave);
+        }
+        ctx.stroke();
+      }
+      if (openness < 0.65) {
+        for (let x = cx + 30; x < cx + cw; x += spacing * 1.4) {
+          ctx.beginPath();
+          ctx.moveTo(x, cy + 56);
+          ctx.lineTo(x + 15, cy + ch - 56);
+          ctx.stroke();
+        }
+      }
+
+      // Spermatozoïdes
+      for (let s = 0; s < 7; s++) {
+        const sy = cy + 115 + s * 62;
+        const isWeak = s === 2 || s === 5;
+        let sx;
+        if (openness > 0.65) {
+          const speed = isWeak ? 55 : 190;
+          sx = cx + cw - ((t * speed + s * 160) % (cw - 80));
+        } else {
+          sx = cx + cw - 70 - Math.abs(Math.sin(t * 3 + s)) * 45;
+        }
+        ctx.beginPath(); ctx.ellipse(sx, sy, 13, 8, 0, 0, Math.PI * 2);
+        ctx.fillStyle = isWeak ? '#94A3B8' : C.male; ctx.fill();
+        ctx.beginPath(); ctx.moveTo(sx + 13, sy);
+        ctx.quadraticCurveTo(sx + 28, sy + Math.sin(t * 14 + s) * 10, sx + 45, sy);
+        ctx.strokeStyle = isWeak ? '#94A3B8' : C.male; ctx.lineWidth = 3; ctx.stroke();
+      }
+
+      // Microbes bloqués
+      if (openness < 0.5) {
+        for (let m = 0; m < 5; m++) {
+          const mx = cx + cw - 35 + Math.cos(t * 4 + m) * 15;
+          const my = cy + 140 + m * 75;
+          ctx.beginPath(); ctx.arc(mx, my, 12, 0, Math.PI * 2);
+          ctx.fillStyle = '#EF4444'; ctx.fill();
+          text('✕', mx, my + 1, 16, '#FFFFFF');
+        }
+      }
+      ctx.restore();
+      // Étiquettes dynamiques placées au-dessus du canal cervical pour ne pas masquer les spermatozoïdes/microbes
+      if (openness > 0.65) {
+        callout(760, 825, 620, 84, 'عبور النطاف القوية بسهولة', 'Passage des spermatozoïdes vigoureux', C.male, 1050, 520, '#FFFFFF');
+      } else if (t >= 367.8) {
+        callout(1180, 825, 600, 84, 'منع الجراثيم وقتلها بإنزيم خاص', 'Blocage et destruction des microbes', C.blood, cx + cw - 35, cy + 290, '#FEE2E2');
+      }
+
+      // Panneau gauche : Les 3 rôles du mucus cervical
+      box(100, 225, 490, 685, 28, '#FFFFFF', '#CBD5E1', 4);
+      text('الأدوار الثلاثة للمخاط العنقي', 345, 268, 25, C.ink);
+      text('Les 3 rôles de la glaire cervicale', 345, 304, 21, C.cyan);
+
+      const roles = [
+        { num: '1', title: 'وسط قاعدي ملائم', fr: 'Milieu alcalin protecteur', desc: 'يحمي النطاف من حموضة المهبل (pH acide)', tm: 379.5, col: C.cyan },
+        { num: '2', title: 'حاجز واقٍ للرحم', fr: 'Barrière anti-microbienne', desc: 'يمنع الجراثيم ويقتلها بإنزيم خاص', tm: 389.9, col: C.blood },
+        { num: '3', title: 'انتقاء النطاف', fr: 'Sélection des spermatozoïdes', desc: 'يعيق الضعيفة والمشوهة', tm: 395.3, col: C.green }
+      ];
+      roles.forEach((r, idx) => {
+        const y = 345 + idx * 180;
+        const active = t >= r.tm;
+        box(120, y, 450, 160, 20, active ? r.col + '18' : '#F8FAFC', active ? r.col : '#CBD5E1', active ? 4 : 2);
+        text(`${r.num}. ${r.title}`, 345, y + 36, 22, active ? r.col : C.muted);
+        text(r.fr, 345, y + 74, 20, active ? C.ink : C.muted, '800');
+        text(r.desc, 345, y + 118, 18, C.muted, '700');
+      });
+    }
+
+    // =========================================================================
+    // SCÈNE 6 : ACTIVITÉ DU MYOMÈTRE (06:41.8 -> 06:53.9 = 413.9s)
+    // =========================================================================
+    function renderScene6(t) {
+      sceneBadge.textContent = "المشهد 6 : نشاط العضلة الرحمية والهدوء الرحمي | Activité du myomètre";
+      clearStage('نشاط العضلة الرحمية', 'Activité contractile du myomètre');
+
+      const beforeOv = t < 407.8;
+
+      box(140, 195, 760, 690, 32, '#FFFFFF', beforeOv ? C.myometrium : '#CBD5E1', beforeOv ? 6 : 3);
+      text('قبل الإباضة (المرحلة الجريبية)', 520, 245, 28, C.myometrium);
+      text('Avant l\'ovulation (Phase folliculaire)', 520, 280, 20, C.muted);
+
+      const pulse = Math.sin(t * 7) * 16;
+      ctx.save();
+      ctx.translate(520, 515);
+      ctx.beginPath();
+      ctx.moveTo(-140 - pulse, -110);
+      ctx.quadraticCurveTo(0, -140 + pulse, 140 + pulse, -110);
+      ctx.lineTo(95 + pulse * 0.7, 110);
+      ctx.quadraticCurveTo(0, 130 - pulse, -95 - pulse * 0.7, 110);
+      ctx.closePath();
+      ctx.fillStyle = C.myometrium;
+      ctx.fill();
+      // Flèches de contraction sur les parois
+      arrow(-195, 0, -145 - pulse, 0, C.blood, 5, 14);
+      arrow(195, 0, 145 + pulse, 0, C.blood, 5, 14);
+      ctx.restore();
+
+      box(210, 715, 620, 115, 20, '#FEE2E2', C.myometrium, 3);
+      text('انقباضات عضلية منتظمة', 520, 755, 26, C.myometrium);
+      text('Contractions régulières du myomètre', 520, 795, 19, '#991B1B');
+
+      const afterPop = easeOut(prog(t, 407.8, 409.0));
+      ctx.save();
+      ctx.globalAlpha = 0.35 + 0.65 * afterPop;
+      box(1020, 195, 760, 690, 32, '#FFFFFF', !beforeOv ? C.green : '#CBD5E1', !beforeOv ? 6 : 3);
+      text('بعد الإباضة (المرحلة الأصفرية)', 1400, 245, 28, C.green);
+      text('Après l\'ovulation (Phase lutéale)', 1400, 280, 20, C.muted);
+
+      ctx.save();
+      ctx.translate(1400, 515);
+      ctx.beginPath();
+      ctx.moveTo(-145, -110);
+      ctx.quadraticCurveTo(0, -135, 145, -110);
+      ctx.lineTo(100, 110);
+      ctx.quadraticCurveTo(0, 125, -100, 110);
+      ctx.closePath();
+      ctx.fillStyle = '#B91C1C';
+      ctx.fill();
+      ctx.beginPath(); ctx.arc(0, -15, 16, 0, Math.PI * 2); ctx.fillStyle = '#FEF08A'; ctx.fill();
+      text('جنين • Embryon', 0, 25, 18, '#FEF08A');
+      ctx.restore();
+
+      box(1090, 715, 620, 115, 20, '#DCFCE7', C.green, 4);
+      text('الهدوء الرحمي (استرخاء تام لتعشيش الجنين)', 1400, 755, 23, '#15803D');
+      text('Silence utérin (relâchement favorable à la nidation)', 1400, 795, 18, '#166534');
+      ctx.restore();
+    }
+
+    // =========================================================================
+    // SCÈNE 7 : TEMPÉRATURE CORPORELLE (06:53.9 -> 07:17.9 = 437.9s)
+    // =========================================================================
+    function renderScene7(t) {
+      sceneBadge.textContent = "المشهد 7 : منحنى حرارة الجسم | Température corporelle (Basale)";
+      clearStage('رابعاً : حرارة الجسم', 'IV. La température corporelle');
+
+      box(1440, 175, 360, 690, 30, '#FFFFFF', C.orange, 4);
+      text('القياس الصباحي', 1620, 225, 26, C.ink);
+      text('Mesure basale au réveil', 1620, 258, 18, C.cyan);
+      text('عند الاستيقاظ وبدون مرض', 1620, 290, 18, C.muted);
+
+      const isHigh = t >= 425.2;
+      box(1595, 335, 50, 355, 25, '#F1F5F9', '#94A3B8', 4);
+      ctx.beginPath(); ctx.arc(1620, 700, 42, 0, Math.PI * 2);
+      ctx.fillStyle = isHigh ? C.blood : C.cyan; ctx.fill();
+      const mercH = isHigh ? 235 : 140;
+      ctx.fillStyle = isHigh ? C.blood : C.cyan;
+      ctx.fillRect(1608, 690 - mercH, 24, mercH);
+      text(isHigh ? 'أعلى من 37°C' : 'أقل من 37°C', 1620, 780, 25, isHigh ? C.blood : C.cyan);
+      text(isHigh ? '> 37 °C (Phase lutéale)' : '< 37 °C (Phase folliculaire)', 1620, 815, 17, C.muted);
+
+      const gx = 200, gy = 175, gw = 1180, gh = 690;
+      box(gx - 60, gy - 30, gw + 100, gh + 120, 30, '#FFFFFF', '#CBD5E1', 4);
+      arrow(gx, gy + gh, gx, gy, C.ink, 5, 16);
+      arrow(gx, gy + gh, gx + gw, gy + gh, C.ink, 5, 16);
+
+      const y37 = gy + gh * 0.48;
+      ctx.save();
+      ctx.setLineDash([12, 10]);
+      ctx.strokeStyle = C.blood;
+      ctx.lineWidth = 4;
+      ctx.beginPath(); ctx.moveTo(gx, y37); ctx.lineTo(gx + gw, y37); ctx.stroke();
+      ctx.restore();
+      text('37 °C', gx - 35, y37, 24, C.blood);
+
+      const x14 = gx + gw * 0.5;
+      ctx.save();
+      ctx.setLineDash([8, 8]);
+      ctx.strokeStyle = '#94A3B8';
+      ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(x14, gy + 40); ctx.lineTo(x14, gy + gh); ctx.stroke();
+      ctx.restore();
+      text('الإباضة • Ovulation (J14)', x14, gy + gh + 35, 22);
+
+      const dayLim = lerp(1, 28, prog(t, 419.9, 434.0));
+      if (dayLim > 1) {
+        ctx.beginPath();
+        for (let d = 1; d <= dayLim; d += 0.25) {
+          const px = gx + (d / 28) * gw;
+          const jitter = Math.sin(d * 2.7) * 14;
+          const py = d < 14 ? (y37 + 85 + jitter) : (y37 - 85 + jitter);
+          d === 1 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+        }
+        ctx.strokeStyle = C.orange;
+        ctx.lineWidth = 8;
+        ctx.stroke();
+
+        // Repère du décrochement thermique à J14
+        if (dayLim >= 14) {
+          ctx.beginPath(); ctx.arc(x14, y37 - 85, 12, 0, Math.PI * 2); ctx.fillStyle = C.blood; ctx.fill();
+        }
+      }
+
+      if (t >= 431.0) {
+        callout(730, 195, 610, 96, 'الارتفاع المفاجئ سببه البروجسترون (دليل الإباضة)', 'Décalage thermique dû à la progestérone', C.orange, x14, y37 - 85, '#FFEDD5');
+      }
+    }
+
+    // =========================================================================
+    // SCÈNE 8 : AUTRES EFFETS DES HORMONES (07:17.9 -> 08:28.7 = 508.7s)
+    // =========================================================================
+    function renderScene8(t) {
+      if (t < 458.9) {
+        sceneBadge.textContent = "المشهد 8 (أ) : الصفات الجنسية الثانوية | Caractères sexuels secondaires";
+        clearStage('خامساً : آثار الإستروجين والصفات الجنسية الثانوية', 'V. Effets des œstrogènes : Caractères sexuels secondaires');
+
+        drawSilhouette(960, 530, 2.3, C.cyan, true);
+
+        const traits = [
+          { ar: 'توزيع الدهون', fr: 'Répartition des graisses', tm: 447.3, x: 1520, y: 270, tx: 1035, ty: 580, col: C.cyan },
+          { ar: 'نمو الشعر (الوبر)', fr: 'Développement de la pilosité', tm: 448.3, x: 1520, y: 490, tx: 1015, ty: 670, col: C.cyan },
+          { ar: 'شكل الحنجرة (الصوت)', fr: 'Morphologie du larynx', tm: 449.2, x: 1520, y: 710, tx: 960, ty: 455, col: C.cyan },
+          { ar: 'اتساع الحوض ونمو الثدي', fr: 'Forme du bassin et développement des seins', tm: 450.2, x: 400, y: 340, tx: 880, ty: 530, col: C.cyan },
+          { ar: 'الاستقلاب والتوازن العصبي والسلوك', fr: 'Métabolisme, équilibre neuro-hormonal et comportement', tm: 453.0, x: 400, y: 630, tx: 930, ty: 375, col: C.fsh }
+        ];
+        traits.forEach(tr => {
+          const p = easeOut(prog(t, tr.tm, tr.tm + 0.6));
+          if (p <= 0) return;
+          ctx.save();
+          ctx.globalAlpha = p;
+          callout(tr.x - 290, tr.y - 52, 580, 104, tr.ar, tr.fr, tr.col, tr.tx, tr.ty, '#FFFFFF');
+          ctx.restore();
+        });
+        return;
+      }
+
+      if (t < 474.9) {
+        sceneBadge.textContent = "المشهد 8 (ب) : تطور الغدة الثديية | Développement de la glande mammaire";
+        clearStage('تأثير الإستروجين والبروجسترون على الغدة الثديية', 'Action combinée sur la glande mammaire');
+
+        box(660, 175, 600, 625, 32, '#FFFFFF', '#CBD5E1', 4);
+        ctx.beginPath();
+        ctx.arc(960, 485, 230, Math.PI * 0.6, Math.PI * 2.4);
+        ctx.fillStyle = '#FFE4E6'; ctx.fill(); ctx.lineWidth = 6; ctx.strokeStyle = '#F43F5E'; ctx.stroke();
+
+        const ductP = easeOut(prog(t, 458.9, 463.5));
+        for (let b = -2; b <= 2; b++) {
+          const ang = b * 0.35;
+          const ex = 960 + Math.cos(ang) * 150 * ductP;
+          const ey = 485 + Math.sin(ang) * 150 * ductP;
+          ctx.beginPath(); ctx.moveTo(960, 485); ctx.lineTo(ex, ey);
+          ctx.strokeStyle = C.cyan; ctx.lineWidth = 8; ctx.stroke();
+
+          if (t >= 463.9) {
+            const acP = easeOut(prog(t, 463.9, 467.5));
+            for (let a = -1; a <= 1; a++) {
+              ctx.beginPath();
+              ctx.arc(ex + Math.cos(ang + a * 0.5) * 26, ey + Math.sin(ang + a * 0.5) * 26, 15 * acP, 0, Math.PI * 2);
+              ctx.fillStyle = C.orange; ctx.fill();
+            }
+          }
+        }
+
+        // Étiquettes dans les colonnes latérales sans toucher la glande
+        callout(1300, 260, 560, 104, 'الإستروجين : يطور قنوات الثدي', 'Œstrogènes : canaux galactophores', C.cyan, 1040, 485, '#E0F2FE');
+
+        if (t >= 463.9) {
+          callout(60, 260, 560, 104, 'البروجسترون : يكوّن الأكياس المفرزة', 'Progestérone : acini sécrétoires', C.orange, 1100, 420, '#FFEDD5');
+        }
+        if (t >= 467.5) {
+          box(360, 845, 1200, 96, 22, '#FEF2F2', C.blood, 4);
+          text('ملاحظة هامة : الهرمونان معاً لا يستطيعان إخراج الحليب', 960, 876, 25, C.blood);
+          text('Ces deux hormones seules ne déclenchent pas l\'éjection du lait', 960, 914, 21, '#991B1B');
+        }
+        return;
+      }
+
+      sceneBadge.textContent = "المشهد 8 (ج - د) : الشبق (Œstrus) ومسحة المهبل | Œstrus et frottis vaginal";
+      clearStage('الشبق (أوستروس) وفحص مسحة المهبل', 'L\'œstrus et l\'examen du frottis vaginal');
+
+      if (t < 491.8) {
+        box(240, 185, 1440, 310, 30, '#FFFFFF', '#EC4899', 5);
+        text('الشبق (Œstrus) عند إناث الثدييات', 960, 235, 32, '#BE185D');
+        // Illustrations 2D des femelles mammifères (brebis, vache, lapine)
+        drawSpeciesFigure('sheep', 660, 320, '#EC4899');
+        drawSpeciesFigure('cow', 960, 320, '#D97706');
+        drawSpeciesFigure('rabbit', 1260, 320, '#8B5CF6');
+        text('تغير سلوكي دوري يهيئ الأنثى للتزاوج في فترة الخصوبة', 960, 412, 24, C.ink);
+        text('Modification comportementale cyclique préparant à l\'accouplement', 960, 452, 21, C.cyan);
+
+        box(1010, 535, 700, 310, 28, '#E0F2FE', C.cyan, 4);
+        text('الإستروجين = هرمون الأنوثة', 1360, 645, 30, C.cyan);
+        text('Œstrogènes = Hormone de la féminité', 1360, 705, 23, C.ink);
+
+        box(210, 535, 700, 310, 28, '#FFEDD5', C.orange, 4);
+        text('البروجسترون = هرمون الأمومة', 560, 625, 30, C.orange);
+        text('Progestérone = Hormone de la maternité', 560, 680, 23, C.ink);
+        text('يهيئ عش الرحم والغدة الثديية • Prépare l\'utérus et la glande mammaire', 560, 740, 20, '#9A3412');
+      } else {
+        const slides = [
+          { title: '1. قبل الشبق', titleFr: 'Avant l\'œstrus', descAr: 'خلايا عادية صغيرة لها نواة', descFr: 'Petites cellules normales nucléées', tm: 496.9, x: 1520, type: 'normal' },
+          { title: '2. أثناء الشبق', titleFr: 'Pendant l\'œstrus', descAr: 'خلايا كبيرة متقرنة بلا نوى', descFr: 'Grandes cellules kératinisées anucléées', tm: 501.2, x: 960, type: 'keratin' },
+          { title: '3. بعد الشبق', titleFr: 'Après l\'œstrus', descAr: 'كثرة الكريات البيضاء', descFr: 'Présence de globules blancs (leucocytes)', tm: 505.4, x: 400, type: 'wbc' }
+        ];
+        slides.forEach(sl => {
+          const p = easeOut(prog(t, sl.tm, sl.tm + 0.7));
+          ctx.save();
+          ctx.globalAlpha = 0.25 + 0.75 * p;
+          box(sl.x - 250, 195, 500, 740, 32, '#FFFFFF', p > 0.5 ? C.cyan : '#CBD5E1', 5);
+          text(sl.title, sl.x, 248, 27, C.ink);
+          text(sl.titleFr, sl.x, 288, 22, C.cyan);
+
+          ctx.beginPath(); ctx.arc(sl.x, 515, 165, 0, Math.PI * 2);
+          ctx.fillStyle = '#F8FAFC'; ctx.fill(); ctx.lineWidth = 6; ctx.strokeStyle = '#94A3B8'; ctx.stroke();
+
+          if (sl.type === 'normal') {
+            [[-55, -40], [50, -30], [-20, 55], [60, 50]].forEach(([dx, dy]) => {
+              ctx.beginPath(); ctx.arc(sl.x + dx, 515 + dy, 28, 0, Math.PI * 2);
+              ctx.fillStyle = '#BAE6FD'; ctx.fill(); ctx.strokeStyle = C.cyan; ctx.lineWidth = 3; ctx.stroke();
+              ctx.beginPath(); ctx.arc(sl.x + dx, 515 + dy, 9, 0, Math.PI * 2);
+              ctx.fillStyle = '#1E3A8A'; ctx.fill();
+            });
+          } else if (sl.type === 'keratin') {
+            [[-45, -35], [45, 25], [-15, 45]].forEach(([dx, dy]) => {
+              ctx.beginPath();
+              ctx.moveTo(sl.x + dx - 52, 515 + dy);
+              ctx.lineTo(sl.x + dx, 515 + dy - 42);
+              ctx.lineTo(sl.x + dx + 55, 515 + dy + 8);
+              ctx.lineTo(sl.x + dx - 10, 515 + dy + 46);
+              ctx.closePath();
+              ctx.fillStyle = '#FDE68A'; ctx.fill(); ctx.strokeStyle = '#D97706'; ctx.lineWidth = 3; ctx.stroke();
+            });
+          } else {
+            for (let w = 0; w < 14; w++) {
+              const ang = w * 2.1;
+              const rad = (w * 11) % 120;
+              ctx.beginPath(); ctx.arc(sl.x + Math.cos(ang) * rad, 515 + Math.sin(ang) * rad, 13, 0, Math.PI * 2);
+              ctx.fillStyle = '#E2E8F0'; ctx.fill(); ctx.strokeStyle = '#64748B'; ctx.lineWidth = 2.5; ctx.stroke();
+            }
+          }
+          text(sl.descAr, sl.x, 765, 24, C.ink);
+          text(sl.descFr, sl.x, 815, 21, C.cyan);
+          ctx.restore();
+        });
+      }
+    }
+
+    // =========================================================================
+    // SCÈNE 9 : HORMONES HYPOPHYSAIRES FSH & LH (08:28.7 -> 09:43.5 = 583.5s)
+    // =========================================================================
+    function renderScene9(t) {
+      sceneBadge.textContent = "المشهد 9 : هرمونا الغدة النخامية (FSH و LH) | Hormones hypophysaires";
+      clearStage('سادساً : هرمونات الغدة النخامية (FSH و LH)', 'VI. Les hormones hypophysaires : FSH et LH');
+
+      box(1330, 170, 500, 730, 30, '#FFFFFF', '#CBD5E1', 4);
+      text('الغدة النخامية • Hypophyse', 1580, 220, 26, C.ink);
+
+      ctx.beginPath();
+      ctx.ellipse(1580, 335, 135, 80, 0, Math.PI, Math.PI * 2);
+      ctx.fillStyle = '#F1F5F9'; ctx.fill(); ctx.lineWidth = 4; ctx.strokeStyle = '#94A3B8'; ctx.stroke();
+      ctx.beginPath(); ctx.arc(1580, 365, 22, 0, Math.PI * 2);
+      ctx.fillStyle = C.fsh; ctx.fill();
+      text('الفص الأمامي للنخامية', 1580, 295, 17, C.muted);
+
+      arrow(1530, 395, 1480, 470, C.fsh, 5, 14);
+      arrow(1630, 395, 1680, 470, C.lh, 5, 14);
+
+      const fshHighlight = t >= 548.2 && t < 562.2;
+      box(1355, 480, 450, 185, 22, fshHighlight ? '#F3E8FF' : '#F8FAFC', C.fsh, fshHighlight ? 5 : 3);
+      text('FSH • Hormone folliculostimulante', 1580, 515, 20, C.fsh);
+      text('• ينمي الجريبات ويحفز الإستروجين', 1580, 558, 19, C.ink, '700');
+      text('• انخفاضه J7 يضمر بقية الجريبات', 1580, 596, 19, C.ink, '700');
+      text('• يرتفع نهاية الدورة لتجنيد جريبات جديدة', 1580, 634, 18, C.fsh, '700');
+
+      const lhHighlight = t >= 562.2;
+      box(1355, 685, 450, 185, 22, lhHighlight ? '#FCE7F3' : '#F8FAFC', C.lh, lhHighlight ? 5 : 3);
+      text('LH • Hormone lutéinisante', 1580, 720, 20, C.lh);
+      text('• ذروته J13 تطلق الإباضة (Ovulation)', 1580, 763, 19, C.ink, '700');
+      text('• يحول الجريب المنفجر لجسم أصفر', 1580, 801, 19, C.ink, '700');
+      text('• Transformation en corps jaune', 1580, 838, 17, C.lh, '700');
+
+      const gx = 160, gy = 170, gw = 1110, gh = 730;
+      box(gx - 50, gy - 25, gw + 80, gh + 100, 30, '#FFFFFF', '#CBD5E1', 4);
+      arrow(gx, gy + gh, gx, gy, C.ink, 5, 16);
+      arrow(gx, gy + gh, gx + gw, gy + gh, C.ink, 5, 16);
+
+      [1, 7, 13, 14, 21, 26, 28].forEach(d => {
+        const px = gx + (d / 28) * gw;
+        text(`J${d}`, px, gy + gh + 32, 21, C.muted);
+      });
+
+      const fshY = (d) => {
+        const init = 0.36 * Math.exp(-Math.pow((d - 4.5) / 2.6, 2));
+        const ovPeak = 0.56 * Math.exp(-Math.pow((d - 13.0) / 1.1, 2));
+        const endRise = d > 25 ? ((d - 25) / 3) * 0.28 : 0;
+        const val = clamp(0.14 + init + ovPeak + endRise, 0.1, 0.9);
+        return gy + gh - val * (gh - 80);
+      };
+
+      const lhY = (d) => {
+        const peak = 0.84 * Math.exp(-Math.pow((d - 13.0) / 0.85, 2));
+        const val = clamp(0.12 + peak, 0.1, 0.96);
+        return gy + gh - val * (gh - 80);
+      };
+
+      const fshLim = t >= 516.9 ? lerp(1, 28, prog(t, 516.9, 534.0)) : 28;
+      const lhLim = t >= 535.1 ? lerp(1, 28, prog(t, 535.1, 545.5)) : (t >= 545.5 ? 28 : 0);
+      const pulseAmp = t >= 573.0 ? 8 : 0;
+
+      if (fshLim > 1) {
+        ctx.beginPath();
+        for (let d = 1; d <= fshLim; d += 0.2) {
+          const px = gx + (d / 28) * gw;
+          const py = fshY(d) + Math.sin(d * 8 + t * 6) * pulseAmp;
+          d === 1 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+        }
+        ctx.strokeStyle = C.fsh; ctx.lineWidth = 7; ctx.stroke();
+      }
+
+      if (lhLim > 1) {
+        ctx.beginPath();
+        for (let d = 1; d <= lhLim; d += 0.2) {
+          const px = gx + (d / 28) * gw;
+          const py = lhY(d) + Math.cos(d * 8 + t * 6) * pulseAmp;
+          d === 1 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+        }
+        ctx.strokeStyle = C.lh; ctx.lineWidth = 7; ctx.stroke();
+
+        // Pointage du pic ovulatoire J13 de LH
+        if (lhLim >= 13) {
+          const px13 = gx + (13 / 28) * gw;
+          const py13 = lhY(13);
+          ctx.beginPath(); ctx.arc(px13, py13, 12, 0, Math.PI * 2); ctx.fillStyle = C.lh; ctx.fill();
+          text('ذروة LH • Pic ovulatoire J13', px13 + 155, py13 + 15, 20, C.lh);
+        }
+      }
+
+      box(205, 195, 240, 56, 16, '#F3E8FF', C.fsh, 3);
+      text('منحنى FSH', 325, 223, 22, C.fsh);
+      if (lhLim > 0) {
+        box(205, 262, 240, 56, 16, '#FCE7F3', C.lh, 3);
+        text('منحنى LH', 325, 290, 22, C.lh);
+      }
+      if (t >= 573.0) {
+        box(710, 195, 540, 74, 18, '#FEF3C7', '#D97706', 3);
+        text('إفراز نبضي (تتغير قوته وتواتره خلال الدورة)', 980, 220, 21, '#B45309');
+        text('Sécrétion pulsatile (fréquence et amplitude variables)', 980, 248, 17, '#D97706');
+      }
+    }
+
+    // =========================================================================
+    // SCÈNE 10 : RÉSUMÉ GÉNÉRAL EN 3 BANDES SYNCHRONISÉES (09:43.5 -> 10:13.38)
+    // =========================================================================
+    function renderScene10(t) {
+      sceneBadge.textContent = "المشهد 10 : الملخص العام — تزامن الدورات الثلاث | Synthèse des 3 cycles";
+      clearStage('ملخص : ثلاث دورات متوازية ومترابطة (28 يوماً)', 'Synthèse : Les trois cycles synchronisés (ovarien, hormonal, utérin)');
+
+      let currentDay = 1;
+      if (t < 594.7) currentDay = lerp(1, 28, prog(t, 585.0, 594.5));
+      else if (t < 600.5) currentDay = lerp(1, 14, prog(t, 594.7, 599.8));
+      else if (t < 607.2) currentDay = lerp(14, 28, prog(t, 600.6, 606.4));
+      else currentDay = t < 611.2 ? 28 : 1;
+
+      const bx = 220, bw = 1560;
+
+      // BANDE 1 : CYCLE OVARIEN
+      box(bx, 135, bw, 225, 24, '#FFFFFF', C.ovaryLine, 4);
+      text('1. دورة المبيض • Cycle ovarien', bx + bw - 210, 170, 24, C.ovaryLine);
+      box(bx + bw / 2, 205, bw / 2 - 20, 130, 18, '#E0F2FE', C.cyan, 2);
+      text('المرحلة الجريبية • Phase folliculaire', bx + bw * 0.75, 270, 23, C.cyan);
+      box(bx + 20, 205, bw / 2 - 20, 130, 18, '#FEF9C3', '#EAB308', 2);
+      text(t >= 607.2 ? 'زوال الجسم الأصفر • Régression du corps jaune' : 'المرحلة الأصفرية • Phase lutéale', bx + bw * 0.25, 270, 23, '#854D0E');
+
+      // BANDE 2 : CYCLE HORMONAL
+      box(bx, 380, bw, 235, 24, '#FFFFFF', C.fsh, 4);
+      text('2. دورة الهرمونات • Cycle hormonal', bx + bw - 220, 415, 24, C.fsh);
+      ctx.beginPath();
+      for (let d = 1; d <= 28; d += 0.3) {
+        const px = bx + bw - ((d - 1) / 27) * (bw - 60) - 30;
+        const est = 0.15 + 0.75 * Math.exp(-Math.pow((d - 13) / 2.2, 2)) + 0.4 * Math.exp(-Math.pow((d - 21) / 3.4, 2));
+        const py = 595 - est * 145;
+        d === 1 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+      }
+      ctx.strokeStyle = C.cyan; ctx.lineWidth = 6; ctx.stroke();
+
+      ctx.beginPath();
+      for (let d = 1; d <= 28; d += 0.3) {
+        const px = bx + bw - ((d - 1) / 27) * (bw - 60) - 30;
+        const prg = 0.05 + 0.8 * Math.exp(-Math.pow((d - 21) / 4.2, 2)) * (d > 12 ? clamp((d - 12) / 3) : 0);
+        const py = 595 - prg * 145;
+        d === 1 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+      }
+      ctx.strokeStyle = C.orange; ctx.lineWidth = 6; ctx.stroke();
+      text('الإستروجين (Œstrogènes)', bx + 180, 415, 20, C.cyan);
+      text('البروجسترون (Progestérone)', bx + 430, 415, 20, C.orange);
+
+      // BANDE 3 : CYCLE UTÉRIN
+      box(bx, 635, bw, 245, 24, '#FFFFFF', C.myometrium, 4);
+      text('3. دورة الرحم • Cycle utérin', bx + bw - 190, 670, 24, C.myometrium);
+      ctx.beginPath();
+      ctx.moveTo(bx + bw - 30, 860);
+      for (let d = 1; d <= 28; d += 0.5) {
+        const px = bx + bw - ((d - 1) / 27) * (bw - 60) - 30;
+        let h = 25;
+        if (d <= 5) h = lerp(130, 20, (d - 1) / 4);
+        else if (d <= 14) h = lerp(20, 65, (d - 5) / 9);
+        else if (d <= 27) h = lerp(65, 140, (d - 14) / 13);
+        else h = 30;
+        ctx.lineTo(px, 860 - h);
+      }
+      ctx.lineTo(bx + 30, 860);
+      ctx.closePath();
+      ctx.fillStyle = C.endometrium;
+      ctx.fill();
+      text('حيض • Règles', bx + bw - 135, 825, 19, '#FFFFFF');
+      text('مرحلة النمو • Phase proliférative', bx + bw * 0.65, 825, 21, C.ink);
+      text('مرحلة الإفراز • Phase sécrétoire', bx + bw * 0.25, 825, 21, C.ink);
+
+      // Curseur vertical synchronisé
+      const curX = bx + bw - ((currentDay - 1) / 27) * (bw - 60) - 30;
+      ctx.save();
+      ctx.strokeStyle = C.blood;
+      ctx.lineWidth = 6;
+      ctx.beginPath(); ctx.moveTo(curX, 125); ctx.lineTo(curX, 895); ctx.stroke();
+      box(curX - 75, 105, 150, 44, 14, C.blood);
+      text(`يوم ${Math.round(currentDay)} • J${Math.round(currentDay)}`, curX, 128, 20, '#FFFFFF');
+      ctx.restore();
+
+      // Carton final bilingue
+      if (t >= 609.5) {
+        const endPop = easeOut(prog(t, 609.5, 610.8));
+        ctx.save();
+        ctx.globalAlpha = endPop;
+        box(240, 390, 1440, 230, 32, 'rgba(15, 23, 42, 0.95)', C.cyan, 5);
+        text('الدورات المبيضية والرحمية والهرمونية مترابطة بشكل وثيق', 960, 450, 32, '#FFFFFF');
+        text('Les cycles ovarien, utérin et hormonal sont étroitement liés', 960, 495, 24, '#38BDF8');
+        text('في غياب الإخصاب : حيض وبداية دورة جديدة (اليوم 1 • Jour 1)', 960, 555, 26, '#FDE047');
+        ctx.restore();
+      }
+    }
+
+    // =========================================================================
+    // MISE À JOUR HUD & BOUCLE PRINCIPALE
+    // =========================================================================
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60);
+      const cs = Math.floor((sec % 1) * 100);
+      return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}.${String(cs).padStart(2, '0')}`;
+    }
+
+    function updateHUD(t) {
+      timecodeBadge.textContent = `${formatTime(t)} / 10:13.38`;
+      timelineSlider.value = t.toFixed(2);
+    }
+
+    function loop(now) {
+      if (isPlaying) {
+        if (hasAudio && !audio.paused) {
+          simTime = audio.currentTime;
+        } else {
+          const dt = lastFrameTimestamp ? (now - lastFrameTimestamp) / 1000 : 0;
+          simTime += dt;
+        }
+        if (simTime >= TOTAL_DURATION) {
+          simTime = TOTAL_DURATION;
+          pausePlayback();
+          if (isRecording && mediaRecorder && mediaRecorder.state !== 'inactive') {
+            mediaRecorder.stop();
+          }
+        }
+      }
+      lastFrameTimestamp = now;
+
+      // Routage exact sur les 10 minutes et 13 secondes
+      if (simTime < 40.6) renderScene1(simTime);
+      else if (simTime < 169.3) renderScene2(simTime);
+      else if (simTime < 191.9) renderScene3(simTime);
+      else if (simTime < 332.7) renderScene4(simTime);
+      else if (simTime < 401.8) renderScene5(simTime);
+      else if (simTime < 413.9) renderScene6(simTime);
+      else if (simTime < 437.9) renderScene7(simTime);
+      else if (simTime < 508.7) renderScene8(simTime);
+      else if (simTime < 583.5) renderScene9(simTime);
+      else renderScene10(simTime);
+
+      updateHUD(simTime);
+      requestAnimationFrame(loop);
+    }
+
+    window.onload = () => requestAnimationFrame(loop);
+  </script>
+</body>
+</html>
